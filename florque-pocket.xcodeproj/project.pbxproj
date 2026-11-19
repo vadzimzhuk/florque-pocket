@@ -1,0 +1,690 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		518EDFF1B41182D895B43E7B /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = 2B0A4747716E786D7F1FD5F4 /* FirebaseAppCheck */; };
+		5D71DD14037D8094D26676EF /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = FCA896AE5EC166A32DA160B3 /* FirebaseAI */; };
+		8A2FE8011FF41B1821DE9700 /* AgentKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE91CD2FAF816F197B15F385 /* AgentKit */; };
+		D5061B57D925161C06D7E85F /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = D59072F9F826D6A21B812EEA /* ExyteChat */; };
+		EDAC028694125FF41960AE6E /* OntologyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3C4BB6403321385A7EF09338 /* OntologyKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		80A285BD30AF566C000A0A5B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 80A285A530AF566A000A0A5B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 80A285AC30AF566A000A0A5B;
+			remoteInfo = "florque-pocket";
+		};
+		80A285C730AF566C000A0A5B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 80A285A530AF566A000A0A5B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 80A285AC30AF566A000A0A5B;
+			remoteInfo = "florque-pocket";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		801B538E30AF7EDB00303831 /* OntologyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = OntologyKit; sourceTree = "<group>"; };
+		80A285AD30AF566A000A0A5B /* florque-pocket.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "florque-pocket.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		80A285BC30AF566C000A0A5B /* florque-pocketTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "florque-pocketTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		80A285C630AF566C000A0A5B /* florque-pocketUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "florque-pocketUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		80A285AF30AF566A000A0A5B /* florque-pocket */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = "florque-pocket";
+			sourceTree = "<group>";
+		};
+		80A285BF30AF566C000A0A5B /* florque-pocketTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = "florque-pocketTests";
+			sourceTree = "<group>";
+		};
+		80A285C930AF566C000A0A5B /* florque-pocketUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = "florque-pocketUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		80A285AA30AF566A000A0A5B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EDAC028694125FF41960AE6E /* OntologyKit in Frameworks */,
+				5D71DD14037D8094D26676EF /* FirebaseAI in Frameworks */,
+				518EDFF1B41182D895B43E7B /* FirebaseAppCheck in Frameworks */,
+				8A2FE8011FF41B1821DE9700 /* AgentKit in Frameworks */,
+				D5061B57D925161C06D7E85F /* ExyteChat in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		80A285B930AF566C000A0A5B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		80A285C330AF566C000A0A5B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		801B538F30AF7EDB00303831 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				801B538E30AF7EDB00303831 /* OntologyKit */,
+			);
+			path = Packages;
+			sourceTree = "<group>";
+		};
+		80A285A430AF566A000A0A5B = {
+			isa = PBXGroup;
+			children = (
+				80A285AF30AF566A000A0A5B /* florque-pocket */,
+				80A285BF30AF566C000A0A5B /* florque-pocketTests */,
+				80A285C930AF566C000A0A5B /* florque-pocketUITests */,
+				80A285AE30AF566A000A0A5B /* Products */,
+				801B538F30AF7EDB00303831 /* Packages */,
+			);
+			sourceTree = "<group>";
+		};
+		80A285AE30AF566A000A0A5B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				80A285AD30AF566A000A0A5B /* florque-pocket.app */,
+				80A285BC30AF566C000A0A5B /* florque-pocketTests.xctest */,
+				80A285C630AF566C000A0A5B /* florque-pocketUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		80A285AC30AF566A000A0A5B /* florque-pocket */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 80A285D030AF566C000A0A5B /* Build configuration list for PBXNativeTarget "florque-pocket" */;
+			buildPhases = (
+				80A285A930AF566A000A0A5B /* Sources */,
+				80A285AA30AF566A000A0A5B /* Frameworks */,
+				80A285AB30AF566A000A0A5B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				80A285AF30AF566A000A0A5B /* florque-pocket */,
+			);
+			name = "florque-pocket";
+			packageProductDependencies = (
+				3C4BB6403321385A7EF09338 /* OntologyKit */,
+				FCA896AE5EC166A32DA160B3 /* FirebaseAI */,
+				2B0A4747716E786D7F1FD5F4 /* FirebaseAppCheck */,
+				FE91CD2FAF816F197B15F385 /* AgentKit */,
+				D59072F9F826D6A21B812EEA /* ExyteChat */,
+			);
+			productName = "florque-pocket";
+			productReference = 80A285AD30AF566A000A0A5B /* florque-pocket.app */;
+			productType = "com.apple.product-type.application";
+		};
+		80A285BB30AF566C000A0A5B /* florque-pocketTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 80A285D330AF566C000A0A5B /* Build configuration list for PBXNativeTarget "florque-pocketTests" */;
+			buildPhases = (
+				80A285B830AF566C000A0A5B /* Sources */,
+				80A285B930AF566C000A0A5B /* Frameworks */,
+				80A285BA30AF566C000A0A5B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				80A285BE30AF566C000A0A5B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				80A285BF30AF566C000A0A5B /* florque-pocketTests */,
+			);
+			name = "florque-pocketTests";
+			productName = "florque-pocketTests";
+			productReference = 80A285BC30AF566C000A0A5B /* florque-pocketTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		80A285C530AF566C000A0A5B /* florque-pocketUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 80A285D630AF566C000A0A5B /* Build configuration list for PBXNativeTarget "florque-pocketUITests" */;
+			buildPhases = (
+				80A285C230AF566C000A0A5B /* Sources */,
+				80A285C330AF566C000A0A5B /* Frameworks */,
+				80A285C430AF566C000A0A5B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				80A285C830AF566C000A0A5B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				80A285C930AF566C000A0A5B /* florque-pocketUITests */,
+			);
+			name = "florque-pocketUITests";
+			productName = "florque-pocketUITests";
+			productReference = 80A285C630AF566C000A0A5B /* florque-pocketUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		80A285A530AF566A000A0A5B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2630;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					80A285AC30AF566A000A0A5B = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					80A285BB30AF566C000A0A5B = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 80A285AC30AF566A000A0A5B;
+					};
+					80A285C530AF566C000A0A5B = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 80A285AC30AF566A000A0A5B;
+					};
+				};
+			};
+			buildConfigurationList = 80A285A830AF566A000A0A5B /* Build configuration list for PBXProject "florque-pocket" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 80A285A430AF566A000A0A5B;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				801B539030AF7F4200303831 /* XCRemoteSwiftPackageReference "agent-kit" */,
+				801B539130AF7F7D00303831 /* XCRemoteSwiftPackageReference "swift-ladybug" */,
+				801B539230AF7FF800303831 /* XCRemoteSwiftPackageReference "Chat" */,
+				9B5E9680CDDFFA16D0EBA728 /* XCLocalSwiftPackageReference "OntologyKit" */,
+				390CDE14BE151F1511A3E9A2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 80A285AE30AF566A000A0A5B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				80A285AC30AF566A000A0A5B /* florque-pocket */,
+				80A285BB30AF566C000A0A5B /* florque-pocketTests */,
+				80A285C530AF566C000A0A5B /* florque-pocketUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		80A285AB30AF566A000A0A5B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		80A285BA30AF566C000A0A5B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		80A285C430AF566C000A0A5B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		80A285A930AF566A000A0A5B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		80A285B830AF566C000A0A5B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		80A285C230AF566C000A0A5B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		80A285BE30AF566C000A0A5B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 80A285AC30AF566A000A0A5B /* florque-pocket */;
+			targetProxy = 80A285BD30AF566C000A0A5B /* PBXContainerItemProxy */;
+		};
+		80A285C830AF566C000A0A5B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 80A285AC30AF566A000A0A5B /* florque-pocket */;
+			targetProxy = 80A285C730AF566C000A0A5B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		80A285CE30AF566C000A0A5B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = L2HG8KUPMF;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		80A285CF30AF566C000A0A5B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = L2HG8KUPMF;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		80A285D130AF566C000A0A5B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = L2HG8KUPMF;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.florque.pocket;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		80A285D230AF566C000A0A5B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = L2HG8KUPMF;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.florque.pocket;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		80A285D430AF566C000A0A5B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = L2HG8KUPMF;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.florque.pocket.florque-pocketTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/florque-pocket.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/florque-pocket";
+			};
+			name = Debug;
+		};
+		80A285D530AF566C000A0A5B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = L2HG8KUPMF;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.florque.pocket.florque-pocketTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/florque-pocket.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/florque-pocket";
+			};
+			name = Release;
+		};
+		80A285D730AF566C000A0A5B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = L2HG8KUPMF;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.florque.pocket.florque-pocketUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "florque-pocket";
+			};
+			name = Debug;
+		};
+		80A285D830AF566C000A0A5B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = L2HG8KUPMF;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.florque.pocket.florque-pocketUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "florque-pocket";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		80A285A830AF566A000A0A5B /* Build configuration list for PBXProject "florque-pocket" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80A285CE30AF566C000A0A5B /* Debug */,
+				80A285CF30AF566C000A0A5B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		80A285D030AF566C000A0A5B /* Build configuration list for PBXNativeTarget "florque-pocket" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80A285D130AF566C000A0A5B /* Debug */,
+				80A285D230AF566C000A0A5B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		80A285D330AF566C000A0A5B /* Build configuration list for PBXNativeTarget "florque-pocketTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80A285D430AF566C000A0A5B /* Debug */,
+				80A285D530AF566C000A0A5B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		80A285D630AF566C000A0A5B /* Build configuration list for PBXNativeTarget "florque-pocketUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80A285D730AF566C000A0A5B /* Debug */,
+				80A285D830AF566C000A0A5B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		9B5E9680CDDFFA16D0EBA728 /* XCLocalSwiftPackageReference "OntologyKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/OntologyKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		390CDE14BE151F1511A3E9A2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.13.0;
+			};
+		};
+		801B539030AF7F4200303831 /* XCRemoteSwiftPackageReference "agent-kit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:Florque/agent-kit.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		801B539130AF7F7D00303831 /* XCRemoteSwiftPackageReference "swift-ladybug" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/LadybugDB/swift-ladybug.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		801B539230AF7FF800303831 /* XCRemoteSwiftPackageReference "Chat" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/Chat.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.3.7;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2B0A4747716E786D7F1FD5F4 /* FirebaseAppCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 390CDE14BE151F1511A3E9A2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAppCheck;
+		};
+		3C4BB6403321385A7EF09338 /* OntologyKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9B5E9680CDDFFA16D0EBA728 /* XCLocalSwiftPackageReference "OntologyKit" */;
+			productName = OntologyKit;
+		};
+		D59072F9F826D6A21B812EEA /* ExyteChat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 801B539230AF7FF800303831 /* XCRemoteSwiftPackageReference "Chat" */;
+			productName = ExyteChat;
+		};
+		FCA896AE5EC166A32DA160B3 /* FirebaseAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 390CDE14BE151F1511A3E9A2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAI;
+		};
+		FE91CD2FAF816F197B15F385 /* AgentKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 801B539030AF7F4200303831 /* XCRemoteSwiftPackageReference "agent-kit" */;
+			productName = AgentKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 80A285A530AF566A000A0A5B /* Project object */;
+}

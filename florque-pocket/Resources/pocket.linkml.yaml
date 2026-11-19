@@ -1,0 +1,116 @@
+id: https://florque.com/pocket
+name: pocket
+title: Pocket ontology (v0.1)
+description: >-
+  Personal note-taking graph. Notes capture everything the user says. Tasks are
+  things to do, optionally with a due time that becomes a calendar reminder.
+  Topics tag notes. Parsed at runtime; edit this file to change the schema.
+default_range: string
+imports:
+  - linkml:types
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  pocket: https://florque.com/pocket/
+
+enums:
+  Status:
+    description: Lifecycle shared by every node.
+    permissible_values:
+      proposed:
+        description: Suggested by the assistant, not yet accepted by the user.
+      active:
+        description: Accepted and current.
+      done:
+        description: Completed.
+      dropped:
+        description: Dismissed or no longer relevant. Kept for history, hidden from context.
+
+  NoteKind:
+    permissible_values:
+      thought:
+        description: A raw idea or passing thought.
+      note:
+        description: Information the user wants to keep.
+
+slots:
+  id:
+    identifier: true
+    range: string
+  title:
+    range: string
+    required: true
+  summary:
+    range: string
+    description: Short self-contained text. Read first when building context.
+  body:
+    range: string
+    description: Full text of a note as the user said it.
+  kind:
+    range: NoteKind
+  status:
+    range: Status
+  due:
+    range: datetime
+    description: For Task. When it is due. Set means a calendar reminder is created on accept.
+  event_id:
+    range: string
+    description: For Task. Identifier of the calendar reminder that mirrors it.
+  created_at:
+    range: datetime
+  updated_at:
+    range: datetime
+
+  # edges, source -> target
+  mentions:
+    range: Topic
+    multivalued: true
+    description: This note talks about that topic.
+    annotations: {edge: true}
+  relates_to:
+    range: Node
+    multivalued: true
+    description: Loose connection between two thoughts, notes or tasks.
+    annotations: {edge: true}
+  about:
+    range: Node
+    multivalued: true
+    description: This task is about that note.
+    annotations: {edge: true}
+  depends_on:
+    range: Task
+    multivalued: true
+    description: Hard prerequisite. Cannot be done before that task.
+    annotations: {edge: true}
+
+classes:
+  Node:
+    abstract: true
+    description: Shared fields for everything in the graph.
+    slots: [id, title, summary, status, created_at, updated_at]
+
+  Note:
+    is_a: Node
+    description: Anything the user passes in, kept as they said it.
+    annotations:
+      use_when: The user shares a thought, fact, idea, meeting detail or anything to remember.
+      not_for: Things to do, which are Task.
+    slots: [body, kind, mentions, relates_to]
+    slot_usage:
+      kind:
+        required: true
+
+  Task:
+    is_a: Node
+    description: Something the user intends to do, optionally at a time.
+    annotations:
+      use_when: The user asks to do, remember to do, or be reminded of something.
+      not_for: Plain information, which is Note.
+    slots: [due, event_id, about, depends_on]
+
+  Topic:
+    is_a: Node
+    description: A tag that groups notes. Its title is the tag name.
+    annotations:
+      use_when: A recurring subject such as a project or person.
+    slots: []
