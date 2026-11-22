@@ -1,6 +1,9 @@
 import Foundation
 
-/// Loosely typed JSON used for node properties, tool arguments and YAML annotations.
+// Purpose: loosely typed JSON for tool arguments (parsed from the model's reply) and for the results the read
+// tools return to the model. Testing: exercised through `ToolExecutorTests` (arguments and results).
+
+/// Loosely typed JSON used for tool arguments and tool results.
 public enum JSONValue: Codable, Sendable, Equatable, Hashable {
     case string(String)
     case number(Double)

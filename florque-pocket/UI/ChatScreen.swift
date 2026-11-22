@@ -34,10 +34,6 @@ struct ChatScreen: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Picker("Backend", selection: $vm.backend) {
-                            Text("Apple Foundation Models").tag(ChatViewModel.Backend.apple)
-                            Text("Firebase AI Logic").tag(ChatViewModel.Backend.firebase)
-                        }
                         Picker("Route", selection: $vm.policy) {
                             Text("Auto").tag(RoutePolicy.auto)
                             Text("On-device only").tag(RoutePolicy.forceOnDevice)

@@ -1,23 +1,20 @@
 import Foundation
 
-/// Compact view of the graph for the prompt: open tasks and recent notes, capped in size.
-/// This is the only graph content sent with a request, so the cloud never sees the whole graph.
-public enum Digest {
-    public static func build(_ snap: GraphSnapshot, maxLines: Int = 40) -> String {
-        let openTasks = snap.nodes.values
-            .filter { $0.className == "Task" && ["proposed", "active"].contains($0.status) }
-            .sorted { ($0.props["due"]?.stringValue ?? "~") < ($1.props["due"]?.stringValue ?? "~") }
-        let notes = snap.nodes.values
-            .filter { $0.className == "Note" && $0.status != "dropped" }
-            .sorted { ($0.props["created_at"]?.stringValue ?? "") > ($1.props["created_at"]?.stringValue ?? "") }
+// Purpose: the compact view of saved items that the answer prompt sees: open tasks and recent notes, capped in
+// size. It is the only saved data sent with a request, so a cloud model never receives the whole store.
+//
+// Testing: `AssistantTests.digestListsOpenTasksAndNotes` checks the lines for open tasks, notes and the empty case.
 
+public enum Digest {
+    /// Builds the digest from already-filtered records (active tasks and notes, as `PocketStore` returns them).
+    public static func build(tasks: [TaskRecord], notes: [NoteRecord], timeZone: TimeZone, maxLines: Int = 40) -> String {
         var lines: [String] = []
         lines.append("Open tasks:")
-        for t in openTasks.prefix(maxLines / 2) {
-            let due = t.props["due"]?.stringValue.map { " due \($0)" } ?? ""
-            lines.append("- Task \(t.id) | \(t.title) |\(due) status \(t.status)")
+        for t in tasks.prefix(maxLines / 2) {
+            let due = t.due.map { " due \(DateParsing.formatLocal($0, in: timeZone))" } ?? ""
+            lines.append("- Task \(t.id) | \(t.title) |\(due) status \(t.status.rawValue)")
         }
-        if openTasks.isEmpty { lines.append("- none") }
+        if tasks.isEmpty { lines.append("- none") }
         lines.append("Recent notes:")
         for n in notes.prefix(maxLines / 2) {
             lines.append("- Note \(n.id) | \(n.title)")

@@ -1,5 +1,9 @@
 import Foundation
 
+// Purpose: the seams to the outside world: the language model and the system reminders. The app implements
+// them with Apple Foundation Models or Firebase, and with EventKit. Tests substitute scripted fakes.
+// Testing: `AssistantTests` and the eval suites use fakes for both, so no test needs a network or EventKit.
+
 /// Where a reply was produced.
 public enum Route: String, Sendable, Equatable {
     case onDevice

@@ -17,62 +17,60 @@ final class ChatViewModel {
     private(set) var entries: [ChatEntry] = []
     var policy: RoutePolicy = .auto
 
-    /// One orchestrator per backend; both share the same store. The backend picker chooses one.
+    /// The model backend the assistant runs on. Fixed for the view model's lifetime.
     enum Backend: String, CaseIterable, Sendable {
         case apple
         case firebase
     }
 
-    var backend: Backend = .apple
-    private let assistants: [Backend: Assistant]
+    /// The one assistant this chat talks to: a backend and a workflow, chosen when the view model is built.
+    private let assistant: Assistant
     private let reminders: any RemindersAdapter
     private let me = User(id: "me", name: "You", avatarURL: nil, isCurrentUser: true)
     private let pocket = User(id: "pocket", name: "Pocket", avatarURL: nil, isCurrentUser: false)
 
-    init(assistants: [Backend: Assistant], reminders: any RemindersAdapter) {
-        self.assistants = assistants
+    init(assistant: Assistant, reminders: any RemindersAdapter) {
+        self.assistant = assistant
         self.reminders = reminders
     }
 
-    private var assistant: Assistant {
-        assistants[backend] ?? assistants[.apple]!
-    }
-
-    /// Builds the production graph: file-backed SwiftData, Firebase model, EventKit reminders.
-    static func makeDefault() -> ChatViewModel {
-        guard let url = Bundle.main.url(forResource: "pocket.linkml", withExtension: "yaml"),
-              let yaml = try? String(contentsOf: url, encoding: .utf8),
-              let ontology = try? Ontology.load(yaml: yaml) else {
-            fatalError("pocket.linkml.yaml is missing from the app bundle")
+    /// Builds the chat's assistant from a backend and a workflow. The store and EventKit reminders are the app's own.
+    static func makeDefault(backend: Backend, workflow: WorkflowID) -> ChatViewModel {
+        let model: any ModelAdapter = switch backend {
+        case .apple: FoundationModelsAdapter()
+        case .firebase: FirebaseModelAdapter()
         }
-        let store = Self.openStore()
-        let assistants: [Backend: Assistant] = [
-            .apple: Assistant(ontology: ontology, store: store, model: FoundationModelsAdapter()),
-            .firebase: Assistant(ontology: ontology, store: store, model: FirebaseModelAdapter()),
-        ]
-        return ChatViewModel(assistants: assistants, reminders: EventKitReminders())
+        let reminders = EventKitReminders()
+        let assistant = Assistant(store: Self.openStore(), model: model, workflow: workflow, reminders: reminders)
+        return ChatViewModel(assistant: assistant, reminders: reminders)
     }
 
-    /// Application Support file store; falls back to memory so the app still opens.
-    private static func openStore() -> any GraphStore {
+    /// Application Support file store; falls back to memory so the app still opens (nothing persists then).
+    private static func openStore() -> PocketStore {
         let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        if let store = try? SwiftDataGraphStore(url: dir.appendingPathComponent("pocket.store")) {
-            return store
+        if let container = try? PocketStore.fileContainer(url: dir.appendingPathComponent("pocket.store")) {
+            return PocketStore(modelContainer: container)
         }
-        return InMemoryGraphStore()
+        guard let container = try? PocketStore.memoryContainer() else {
+            fatalError("SwiftData could not open even an in-memory store")
+        }
+        return PocketStore(modelContainer: container)
     }
 
     func send(_ text: String) {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
+        // The last five chat lines (user and assistant) before this message, as the workflows expect them.
+        let history = entries.suffix(5).filter { $0.text != "…" }.map { "\($0.isUser ? "user" : "assistant"): \($0.text)" }
         entries.append(ChatEntry(id: UUID().uuidString, isUser: true, text: trimmed))
         let placeholder = ChatEntry(id: UUID().uuidString, isUser: false, text: "…")
         entries.append(placeholder)
         let policy = self.policy
+        let target = assistant
         Task {
             do {
-                let turn = try await assistant.handle(trimmed, policy: policy)
+                let turn = try await target.handle(trimmed, policy: policy, history: history)
                 replace(placeholder.id, with: ChatEntry(id: placeholder.id, isUser: false, text: turn.say,
                                                         routeLabel: turn.routeLabel, proposals: turn.proposals))
             } catch {

@@ -1,5 +1,8 @@
 import Foundation
 
+// Purpose: reads and writes the ISO local date-times used for due times, in one time zone.
+// Testing: exercised by `PocketStoreTests` (due times) and `ToolExecutorTests` (rejected and accepted due values).
+
 /// Parses the model's ISO date-times. Values without a zone are local time in `timeZone`.
 public enum DateParsing {
     public static func parse(_ text: String, in timeZone: TimeZone = .current) -> Date? {

@@ -10,7 +10,6 @@
 		518EDFF1B41182D895B43E7B /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = 2B0A4747716E786D7F1FD5F4 /* FirebaseAppCheck */; };
 		5D71DD14037D8094D26676EF /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = FCA896AE5EC166A32DA160B3 /* FirebaseAI */; };
 		807CB66630B093260008918A /* AgentKit in Frameworks */ = {isa = PBXBuildFile; productRef = 807CB66530B093260008918A /* AgentKit */; };
-		82C18601EECEBB0352D7CB95 /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = DC2C8E389C8B8A15BED19327 /* Yams */; };
 		D5061B57D925161C06D7E85F /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = D59072F9F826D6A21B812EEA /* ExyteChat */; };
 /* End PBXBuildFile section */
 
@@ -64,7 +63,6 @@
 				518EDFF1B41182D895B43E7B /* FirebaseAppCheck in Frameworks */,
 				807CB66630B093260008918A /* AgentKit in Frameworks */,
 				D5061B57D925161C06D7E85F /* ExyteChat in Frameworks */,
-				82C18601EECEBB0352D7CB95 /* Yams in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,7 +134,6 @@
 				FCA896AE5EC166A32DA160B3 /* FirebaseAI */,
 				2B0A4747716E786D7F1FD5F4 /* FirebaseAppCheck */,
 				D59072F9F826D6A21B812EEA /* ExyteChat */,
-				DC2C8E389C8B8A15BED19327 /* Yams */,
 				807CB66530B093260008918A /* AgentKit */,
 			);
 			productName = "florque-pocket";
@@ -221,7 +218,6 @@
 				801B539030AF7F4200303831 /* XCRemoteSwiftPackageReference "agent-kit" */,
 				801B539230AF7FF800303831 /* XCRemoteSwiftPackageReference "Chat" */,
 				390CDE14BE151F1511A3E9A2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				7FCCCA08B2B2FB7104318BFA /* XCRemoteSwiftPackageReference "Yams" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 80A285AE30AF566A000A0A5B /* Products */;
@@ -618,14 +614,6 @@
 				minimumVersion = 12.13.0;
 			};
 		};
-		7FCCCA08B2B2FB7104318BFA /* XCRemoteSwiftPackageReference "Yams" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/jpsim/Yams.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.0;
-			};
-		};
 		801B539030AF7F4200303831 /* XCRemoteSwiftPackageReference "agent-kit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "git@github.com:Florque/agent-kit.git";
@@ -659,11 +647,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 801B539230AF7FF800303831 /* XCRemoteSwiftPackageReference "Chat" */;
 			productName = ExyteChat;
-		};
-		DC2C8E389C8B8A15BED19327 /* Yams */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 7FCCCA08B2B2FB7104318BFA /* XCRemoteSwiftPackageReference "Yams" */;
-			productName = Yams;
 		};
 		FCA896AE5EC166A32DA160B3 /* FirebaseAI */ = {
 			isa = XCSwiftPackageProductDependency;
