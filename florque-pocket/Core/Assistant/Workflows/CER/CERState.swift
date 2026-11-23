@@ -11,7 +11,7 @@ nonisolated enum CERStep: String, Sendable, CaseIterable {
     case classify, classifyRepair, extract, extractRepair, execute, respond, respondRepair, clarify
 }
 
-/// A checked extraction: tool calls to run, and what the user still has to say (for example "time").
+/// A checked extraction: tool calls to run, and the arguments the user still has to give (for example "when").
 nonisolated struct CERExtraction: Sendable, Equatable {
     let calls: [CERCall]
     let missing: [String]

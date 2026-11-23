@@ -1,10 +1,13 @@
 import Foundation
 
 // Purpose: the reply parsers of the `cer` steps (the parse stage of each step calls these). Each parser takes the
-// model's text and returns the values the step needs, or the reason they are missing. The JSON object is found by
+// model's text and returns the values the step needs, or the reason they are not usable. The JSON object is found by
 // position (first `{` to last `}`), so prose around the JSON is ignored.
+// - classify: `{"intent": <one of the six values>, "reason": ...}`.
+// - extract: `{"args": {...}}`. The flattened form (arguments beside "tool" or with no "args") is also accepted, since
+//   a small model sometimes writes it that way. A missing required argument is reported in `missing`, not rejected.
 //
-// Testing: `CERTests` (parse stage) covers valid, invalid, invented-tool and missing-time replies.
+// Testing: `CERTests` (parse stage) covers each shape, the flattened form, missing and invalid arguments.
 
 nonisolated struct CERClassifyOutput: Sendable, Equatable {
     let intent: CERIntent
@@ -14,16 +17,6 @@ nonisolated struct CERClassifyOutput: Sendable, Equatable {
 nonisolated struct CERClassifyReply: Decodable, Sendable {
     let intent: String
     let reason: String?
-}
-
-nonisolated struct CERExtractCall: Decodable, Sendable {
-    let tool: String
-    let args: [String: JSONValue]?
-}
-
-nonisolated struct CERExtractReply: Decodable, Sendable {
-    let calls: [CERExtractCall]?
-    let missing: [String]?
 }
 
 nonisolated struct CERSayReply: Decodable, Sendable {
@@ -43,48 +36,42 @@ nonisolated enum CERParse {
         }
     }
 
-    /// Reply `{"intent","reason"}`. The intent must be one of the four known values.
+    /// Reply `{"intent","reason"}`. The intent must be one of the six values (four tools, chat, unclear).
     static func classify(_ text: String) -> Checked<CERClassifyOutput> {
         switch object(text, as: CERClassifyReply.self) {
         case .rejected(let why): return .rejected(why)
         case .ok(let reply):
             guard let intent = CERIntent(rawValue: reply.intent) else {
-                return .rejected("intent must be record, retrieve, chat or unclear")
+                return .rejected("intent must be one of record_note, record_event, retrieve_notes, retrieve_events, chat, unclear")
             }
             return .ok(CERClassifyOutput(intent: intent, reason: TokenBudget.clip(reply.reason ?? "", 200)))
         }
     }
 
-    /// Reply `{"calls","missing"}`. Checks the calls against the intent's tools. A `record_event` without `when` is not
-    /// an error: it becomes "time" in `missing`, so the clarify step asks for it.
+    /// Reply `{"args": {...}}` (or flattened) for the intent's one tool. Required arguments that are absent or blank come
+    /// back in `missing` with no call; present arguments that are invalid are rejected for the repair.
     static func extract(_ text: String, intent: CERIntent) -> Checked<CERExtraction> {
-        let reply: CERExtractReply
-        switch object(text, as: CERExtractReply.self) {
+        guard let tool = CERToolbox.tool(for: intent) else {
+            return .rejected("a \(intent.rawValue) message takes no tool")
+        }
+        let reply: [String: JSONValue]
+        switch object(text, as: [String: JSONValue].self) {
         case .rejected(let why): return .rejected(why)
         case .ok(let value): reply = value
         }
-        var missing = reply.missing ?? []
-        var calls: [CERCall] = []
-        for raw in reply.calls ?? [] {
-            let args = raw.args ?? [:]
-            if raw.tool == RecordEventTool().name, args["when"] == nil {
-                if !missing.contains("time") { missing.append("time") }
-                continue
-            }
-            guard let tool = CERToolbox.tool(named: raw.tool), tool.intent == intent else {
-                return .rejected("tool \(raw.tool) is not allowed for a \(intent.rawValue) message")
-            }
-            if let problem = tool.problem(args) { return .rejected(problem) }
-            calls.append(CERCall(tool: raw.tool, args: args))
+        let args = arguments(of: reply)
+        let missing = tool.requiredArgs.filter { ToolArgs.isBlank(args, $0) }
+        if !missing.isEmpty {
+            return .ok(CERExtraction(calls: [], missing: missing))
         }
-        if calls.count > 3 { return .rejected("at most 3 tool calls") }
-        switch intent {
-        case .chat, .unclear:
-            if !calls.isEmpty { return .rejected("a \(intent.rawValue) message takes no tool") }
-        case .record, .retrieve:
-            if calls.isEmpty && missing.isEmpty { return .rejected("no tool call for a \(intent.rawValue) message") }
-        }
-        return .ok(CERExtraction(calls: calls, missing: missing))
+        if let problem = tool.problem(args) { return .rejected(problem) }
+        return .ok(CERExtraction(calls: [CERCall(tool: tool.name, args: args)], missing: []))
+    }
+
+    /// The arguments of a reply: the `args` object when there is one, otherwise every key except the envelope's own.
+    private static func arguments(of reply: [String: JSONValue]) -> [String: JSONValue] {
+        if case .object(let nested)? = reply["args"] { return nested }
+        return reply.filter { $0.key != "args" && $0.key != "missing" && $0.key != "tool" }
     }
 
     /// Reply `{"say": "..."}`, or plain prose with no braces (accepted as the text itself).

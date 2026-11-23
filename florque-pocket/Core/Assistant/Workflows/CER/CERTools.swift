@@ -1,11 +1,12 @@
 import Foundation
 
 // Purpose: the tools of the `cer` workflow. Four tools: record_note, record_event (write) and retrieve_notes,
-// retrieve_events (read). Each tool checks its own arguments, runs against `PocketStore`, and reports a short result.
-// The toolbox lists the tools per intent, so an extract prompt only names the tools that intent may use.
+// retrieve_events (read). The classifier picks one of them by name (see `CERIntent`), so the classify step holds all
+// the classification logic; the extract step only fills that tool's arguments. Each tool names its required arguments,
+// gives one example for the prompt, checks the arguments that are present, and runs against `PocketStore`.
 //
-// Testing: `CERToolTests` runs each tool on an in-memory store: argument checks, writes, reads, limits, and the
-// reminder for an event.
+// Testing: `CERToolTests` runs each tool on an in-memory store: required arguments, argument checks, writes, reads,
+// limits, and the reminder for an event.
 
 /// A tool call the model asked for: name and arguments, already checked by the parser.
 nonisolated struct CERCall: Sendable, Equatable {
@@ -42,19 +43,33 @@ nonisolated struct CERToolContext: Sendable {
 }
 
 nonisolated protocol CERTool: Sendable {
+    /// The tool's name, which is also the classifier's value for it.
     var name: String { get }
-    /// `record` for write tools, `retrieve` for read tools.
-    var intent: CERIntent { get }
-    /// One catalog line, e.g. `record_note(body, title?): save a note the user shared`. Sent in every extract prompt.
+    /// Arguments the turn cannot run without. A missing one is asked for in the clarify step.
+    var requiredArgs: [String] { get }
+    /// One catalog line, e.g. `record_note(body, title?): save a note`. Sent in the extract prompt.
     var catalogLine: String { get }
-    /// Nil when the arguments are usable; otherwise the reason, for the repair prompt.
+    /// One example of its arguments as JSON, sent in the extract prompt.
+    var exampleArgs: String { get }
+    /// Nil when the arguments that are present are usable; otherwise the reason, for the repair prompt.
+    /// Missing required arguments are not checked here: the parser reports them as `missing`.
     func problem(_ args: [String: JSONValue]) -> String?
     func run(_ args: [String: JSONValue], _ context: CERToolContext) async throws -> CERToolResult
 }
 
-/// The intents of a turn. Only `record` and `retrieve` use tools; `chat` and `unclear` do not.
+/// The classifier's values. A tool name means the message needs that tool; `chat` and `unclear` need none.
 nonisolated enum CERIntent: String, Sendable, Equatable, CaseIterable {
-    case record, retrieve, chat, unclear
+    case recordNote = "record_note"
+    case recordEvent = "record_event"
+    case retrieveNotes = "retrieve_notes"
+    case retrieveEvents = "retrieve_events"
+    case chat
+    case unclear
+
+    /// True when the message needs a tool (extract then fills its arguments).
+    var needsTool: Bool {
+        self != .chat && self != .unclear
+    }
 }
 
 // MARK: - Argument helpers
@@ -62,6 +77,15 @@ nonisolated enum CERIntent: String, Sendable, Equatable, CaseIterable {
 nonisolated enum ToolArgs {
     static func text(_ args: [String: JSONValue], _ key: String) -> String? {
         args[key]?.stringValue?.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// True when the argument is absent, null, or an empty string.
+    static func isBlank(_ args: [String: JSONValue], _ key: String) -> Bool {
+        switch args[key] {
+        case nil, .null?: return true
+        case .string(let s)?: return s.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        default: return false
+        }
     }
 
     /// At most 5 results, at least 1. Missing or non-numeric values use `value`.
@@ -89,12 +113,12 @@ nonisolated enum ToolArgs {
 
 nonisolated struct RecordNoteTool: CERTool {
     let name = "record_note"
-    let intent = CERIntent.record
-    let catalogLine = "record_note(body, title?): save a note the user shared"
+    let requiredArgs = ["body"]
+    let catalogLine = "record_note(body, title?): save a note"
+    let exampleArgs = #"{"body":"wifi code 4411"}"#
 
     func problem(_ args: [String: JSONValue]) -> String? {
-        if (ToolArgs.text(args, "body") ?? "").isEmpty { return "record_note needs a body" }
-        return nil
+        nil
     }
 
     func run(_ args: [String: JSONValue], _ context: CERToolContext) async throws -> CERToolResult {
@@ -109,12 +133,11 @@ nonisolated struct RecordNoteTool: CERTool {
 
 nonisolated struct RecordEventTool: CERTool {
     let name = "record_event"
-    let intent = CERIntent.record
-    let catalogLine = "record_event(title, when): add an event with its date and time (when is required)"
+    let requiredArgs = ["title", "when"]
+    let catalogLine = "record_event(title, when): add an event; when is an ISO local date-time"
+    let exampleArgs = #"{"title":"Dentist","when":"2026-11-27T09:00:00"}"#
 
     func problem(_ args: [String: JSONValue]) -> String? {
-        if (ToolArgs.text(args, "title") ?? "").isEmpty { return "record_event needs a title" }
-        if args["when"] == nil { return "record_event needs when" }
         if case .failure(let why) = ToolArgs.date(args, "when", .current) { return why.message }
         return nil
     }
@@ -140,8 +163,9 @@ nonisolated struct RecordEventTool: CERTool {
 
 nonisolated struct RetrieveNotesTool: CERTool {
     let name = "retrieve_notes"
-    let intent = CERIntent.retrieve
+    let requiredArgs: [String] = []
     let catalogLine = "retrieve_notes(query?, limit?): find saved notes by words"
+    let exampleArgs = #"{"query":"wifi"}"#
 
     func problem(_ args: [String: JSONValue]) -> String? {
         guard let value = args["limit"] else { return nil }
@@ -160,8 +184,9 @@ nonisolated struct RetrieveNotesTool: CERTool {
 
 nonisolated struct RetrieveEventsTool: CERTool {
     let name = "retrieve_events"
-    let intent = CERIntent.retrieve
+    let requiredArgs: [String] = []
     let catalogLine = "retrieve_events(query?, from?, to?, limit?): find events, optionally between two ISO date-times"
+    let exampleArgs = #"{"from":"2026-11-27T00:00:00","to":"2026-11-27T23:59:59"}"#
 
     func problem(_ args: [String: JSONValue]) -> String? {
         for key in ["from", "to"] {
@@ -190,13 +215,8 @@ nonisolated enum CERToolbox {
         all.first { $0.name == name }
     }
 
-    /// The tools one intent may call. `chat` and `unclear` have none.
-    static func tools(for intent: CERIntent) -> [any CERTool] {
-        all.filter { $0.intent == intent }
-    }
-
-    /// The catalog lines for one intent, as the extract prompt lists them.
-    static func catalog(for intent: CERIntent) -> String {
-        tools(for: intent).map { "- \($0.catalogLine)" }.joined(separator: "\n")
+    /// The tool a classifier value names. Nil for `chat` and `unclear`.
+    static func tool(for intent: CERIntent) -> (any CERTool)? {
+        intent.needsTool ? tool(named: intent.rawValue) : nil
     }
 }

@@ -92,7 +92,7 @@ nonisolated struct CERWorkflow: TurnWorkflow {
                 return CERStep.respond.rawValue
             case .unclear:
                 return CERStep.clarify.rawValue
-            case .record, .retrieve:
+            default:
                 return CERStep.extract.rawValue
             }
         }

@@ -30,8 +30,8 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
 
 @Suite struct CERParserTests {
     @Test func classifyAcceptsAKnownIntent() throws {
-        let out = try #require(unwrap(CERParse.classify(#"{"intent":"record","reason":"a note"}"#)))
-        #expect(out.intent == .record)
+        let out = try #require(unwrap(CERParse.classify(#"{"intent":"record_note","reason":"a note"}"#)))
+        #expect(out.intent == .recordNote)
         #expect(out.reason == "a note")
     }
 
@@ -39,29 +39,35 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
         #expect(reason(CERParse.classify(#"{"intent":"shopping","reason":"x"}"#)) != nil)
     }
 
-    @Test func extractTurnsAMissingEventTimeIntoMissing() throws {
-        let text = #"{"calls":[{"tool":"record_event","args":{"title":"Dentist"}}],"missing":[]}"#
-        let extraction = try #require(unwrap(CERParse.extract(text, intent: .record)))
+    @Test func extractReportsAMissingWhenInsteadOfACall() throws {
+        let text = #"{"args":{"title":"Dentist"}}"#
+        let extraction = try #require(unwrap(CERParse.extract(text, intent: .recordEvent)))
         #expect(extraction.calls.isEmpty)
-        #expect(extraction.missing == ["time"])
+        #expect(extraction.missing == ["when"])
+    }
+
+    @Test func extractReadsTheFlattenedFormTheModelSometimesWrites() throws {
+        let text = #"{"tool":"record_event","title":"interview round with Atlassian","when":"2026-11-23T10:00:00"}"#
+        let extraction = try #require(unwrap(CERParse.extract(text, intent: .recordEvent)))
+        #expect(extraction.missing.isEmpty)
+        #expect(extraction.calls == [CERCall(tool: "record_event", args: [
+            "title": .string("interview round with Atlassian"), "when": .string("2026-11-23T10:00:00")])])
+    }
+
+    @Test func extractRejectsAnUnreadableWhen() {
+        let text = #"{"args":{"title":"Dentist","when":"soon"}}"#
+        #expect(reason(CERParse.extract(text, intent: .recordEvent)) != nil)
     }
 
     @Test func classifyRejectsEventAndListsTheValidIntents() {
         guard case .rejected(let why) = CERParse.classify(#"{"intent":"event","reason":"schedule"}"#) else {
             Issue.record("event is not an intent"); return
         }
-        #expect(why.contains("record, retrieve, chat or unclear"))
+        #expect(why.contains("record_note, record_event, retrieve_notes, retrieve_events, chat, unclear"))
     }
 
-    @Test func extractRejectsAnInventedTool() {
-        let text = #"{"calls":[{"tool":"say","args":{"content":"Hello"}}],"missing":[]}"#
-        let why = reason(CERParse.extract(text, intent: .chat))
-        #expect(why?.contains("say") == true)
-    }
-
-    @Test func extractRejectsAToolOfAnotherIntent() {
-        let text = #"{"calls":[{"tool":"retrieve_notes","args":{}}],"missing":[]}"#
-        #expect(reason(CERParse.extract(text, intent: .record)) != nil)
+    @Test func extractRejectsAChatMessageBecauseItHasNoTool() {
+        #expect(reason(CERParse.extract(#"{"args":{"content":"Hello"}}"#, intent: .chat)) != nil)
     }
 
     @Test func sayAcceptsJSONAndProse() {
@@ -89,8 +95,8 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
     @Test func classifyPromptSaysEventIsNotAnIntentAndGivesAnExamplePerIntent() {
         let system = ClassifyStep(repair: false).prompt(
             ClassifyStep.Input(turn: CERTurnValues(cerState(), repair: false))).system
-        #expect(system.contains(#""event" and "note" are things, never intents."#))
-        for example in [#""hi" -> chat"#, #""Dentist Friday 9am" -> record"#, #""What events do I have tomorrow?" -> retrieve"#, #""tomorrow" -> unclear"#] {
+        #expect(system.contains(#""event" and "note" are not values."#))
+        for example in [#""hi" -> chat"#, #""Wifi code is 4411" -> record_note"#, #""What events do I have tomorrow?" -> retrieve_events"#, #""tomorrow" -> unclear"#] {
             #expect(system.contains(example))
         }
     }
@@ -98,7 +104,7 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
     @Test func classifyRepairPromptNamesTheMistake() {
         let system = ClassifyStep(repair: true).prompt(
             ClassifyStep.Input(turn: CERTurnValues(cerState(), repair: true))).system
-        #expect(system.contains(#""event" and "note" are not intents"#))
+        #expect(system.contains(#""event" and "note" alone are not values"#))
     }
 
     @Test func promptHoldsTheMessageAndTheReplyShape() throws {
@@ -129,10 +135,10 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
         let s = cerState()
         let input = ClassifyStep.Input(turn: CERTurnValues(s, repair: false))
         let step = ClassifyStep(repair: false)
-        let once = step.reduce(s, input, .ok(CERClassifyOutput(intent: .record, reason: "a")))
-        #expect(once.intent == .record)
+        let once = step.reduce(s, input, .ok(CERClassifyOutput(intent: .recordNote, reason: "a")))
+        #expect(once.intent == .recordNote)
         let twice = step.reduce(once, input, .ok(CERClassifyOutput(intent: .chat, reason: "b")))
-        #expect(twice.intent == .record)
+        #expect(twice.intent == .recordNote)
         #expect(twice.rejections.count == 1)
     }
 
@@ -156,34 +162,35 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
     @Test func gateRefusesWithoutAnIntentAndForUnclear() {
         #expect(reason(ExtractStep(repair: false).gate(cerState())) != nil)
         #expect(reason(ExtractStep(repair: false).gate(classified(.unclear))) != nil)
-        #expect(unwrap(ExtractStep(repair: false).gate(classified(.record))) != nil)
+        #expect(unwrap(ExtractStep(repair: false).gate(classified(.recordNote))) != nil)
     }
 
-    @Test func promptListsOnlyTheToolsOfTheIntent() throws {
-        let input = try #require(unwrap(ExtractStep(repair: false).gate(classified(.record))))
+    @Test func promptShowsOnlyTheChosenTool() throws {
+        let input = try #require(unwrap(ExtractStep(repair: false).gate(classified(.recordEvent))))
         let system = ExtractStep(repair: false).prompt(input).system
-        #expect(system.contains("record_note"))
-        #expect(!system.contains("retrieve_notes"))
+        #expect(system.contains("record_event"))
+        #expect(!system.contains("record_note"))
+        #expect(!system.contains("retrieve_events"))
     }
 
     @Test func processReturnsTheScriptedCalls() async throws {
-        let model = FakeModel([(#"{"calls":[{"tool":"record_note","args":{"body":"milk"}}],"missing":[]}"#, .onDevice)])
-        let input = try #require(unwrap(ExtractStep(repair: false).gate(classified(.record))))
+        let model = FakeModel([(#"{"args":{"body":"milk"}}"#, .onDevice)])
+        let input = try #require(unwrap(ExtractStep(repair: false).gate(classified(.recordNote))))
         let env = CEREnv(model: model, store: try makeMemoryStore(), reminders: nil)
         let step = ExtractStep(repair: false)
         let raw = await step.process(step.prompt(input), input, env)
-        #expect(unwrap(raw)?.contains("record_note") == true)
+        #expect(unwrap(raw)?.contains("milk") == true)
     }
 
     @Test func parseTurnsAMissingTimeIntoMissing() throws {
-        let input = try #require(unwrap(ExtractStep(repair: false).gate(classified(.record))))
-        let parsed = ExtractStep(repair: false).parse(#"{"calls":[{"tool":"record_event","args":{"title":"Dentist"}}]}"#, input)
-        #expect(unwrap(parsed)?.missing == ["time"])
+        let input = try #require(unwrap(ExtractStep(repair: false).gate(classified(.recordEvent))))
+        let parsed = ExtractStep(repair: false).parse(#"{"args":{"title":"Dentist"}}"#, input)
+        #expect(unwrap(parsed)?.missing == ["when"])
     }
 
     @Test func reduceCountsAFailedExtraction() {
-        let s = classified(.record)
-        let input = ExtractStep.Input(turn: CERTurnValues(s, repair: false), intent: .record)
+        let s = classified(.recordNote)
+        let input = ExtractStep.Input(turn: CERTurnValues(s, repair: false), intent: .recordNote, tool: RecordNoteTool())
         let after = ExtractStep(repair: false).reduce(s, input, .rejected("bad args"))
         #expect(after.extractAttempts == 1)
         #expect(after.problem == "bad args")
@@ -196,9 +203,10 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
     @Test func gateRefusesWhileSomethingIsMissing() {
         var s = cerState()
         s = ClassifyStep(repair: false).reduce(s, ClassifyStep.Input(turn: CERTurnValues(s, repair: false)),
-                                               .ok(CERClassifyOutput(intent: .record, reason: "e")))
-        s = ExtractStep(repair: false).reduce(s, ExtractStep.Input(turn: CERTurnValues(s, repair: false), intent: .record),
-                                              .ok(CERExtraction(calls: [], missing: ["time"])))
+                                               .ok(CERClassifyOutput(intent: .recordEvent, reason: "e")))
+        s = ExtractStep(repair: false).reduce(s, ExtractStep.Input(turn: CERTurnValues(s, repair: false), intent: .recordEvent,
+                                                                   tool: RecordEventTool()),
+                                              .ok(CERExtraction(calls: [], missing: ["when"])))
         #expect(reason(ExecuteStep().gate(s)) != nil)
     }
 
@@ -286,8 +294,8 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
 
     @Test func fallbackAsksForTheMissingTime() {
         var s = cerState()
-        s.extraction = CERExtraction(calls: [], missing: ["time"])
-        let input = ClarifyStep.Input(turn: CERTurnValues(s, repair: false), missing: ["time"], toolError: nil, intent: .record)
+        s.extraction = CERExtraction(calls: [], missing: ["when"])
+        let input = ClarifyStep.Input(turn: CERTurnValues(s, repair: false), missing: ["when"], toolError: nil, intent: .recordEvent)
         let after = ClarifyStep().reduce(s, input, .rejected("the model call failed"))
         #expect(after.question == "When should it happen? Please give a date and time.")
         #expect(after.say == after.question)
@@ -350,7 +358,7 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
     }
 
     @Test func recordEventNeedsAParseableWhen() {
-        #expect(RecordEventTool().problem(["title": .string("Dentist")]) != nil)
+        #expect(RecordEventTool().problem(["title": .string("Dentist")]) == nil, "a missing when is the parser's job")
         #expect(RecordEventTool().problem(["title": .string("Dentist"), "when": .string("soon")]) != nil)
         #expect(RecordEventTool().problem(["title": .string("Dentist"), "when": .string("2026-11-27T09:00:00")]) == nil)
     }
@@ -377,9 +385,11 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
         #expect(none.items.isEmpty)
     }
 
-    @Test func toolboxListsOnlyTheToolsOfAnIntent() {
-        #expect(CERToolbox.tools(for: .record).map(\.name) == ["record_note", "record_event"])
-        #expect(CERToolbox.tools(for: .chat).isEmpty)
+    @Test func aClassifierValueNamesItsTool() {
+        #expect(CERToolbox.tool(for: .recordEvent)?.name == "record_event")
+        #expect(CERToolbox.tool(for: .retrieveNotes)?.requiredArgs.isEmpty == true)
+        #expect(CERToolbox.tool(for: .chat) == nil)
+        #expect(CERToolbox.tool(for: .unclear) == nil)
     }
 }
 
@@ -393,8 +403,8 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
     @Test func noteIsSavedAndAnswered() async throws {
         let store = try makeMemoryStore()
         let model = FakeModel([
-            (#"{"intent":"record","reason":"a note"}"#, .onDevice),
-            (#"{"calls":[{"tool":"record_note","args":{"body":"buy milk"}}],"missing":[]}"#, .onDevice),
+            (#"{"intent":"record_note","reason":"a note"}"#, .onDevice),
+            (#"{"args":{"body":"buy milk"}}"#, .onDevice),
             (#"{"say":"Saved your note."}"#, .onDevice),
         ])
         let turn = try await make(model, store: store).handle("buy milk", policy: .forceOnDevice)
@@ -407,8 +417,8 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
     @Test func eventWithoutATimeAsksAndSavesNothing() async throws {
         let store = try makeMemoryStore()
         let model = FakeModel([
-            (#"{"intent":"record","reason":"an event"}"#, .onDevice),
-            (#"{"calls":[{"tool":"record_event","args":{"title":"Dentist"}}],"missing":[]}"#, .onDevice),
+            (#"{"intent":"record_event","reason":"an event"}"#, .onDevice),
+            (#"{"args":{"title":"Dentist"}}"#, .onDevice),
             (#"{"say":"When should it happen?"}"#, .onDevice),
         ])
         let turn = try await make(model, store: store).handle("dentist", policy: .forceOnDevice)
@@ -417,18 +427,30 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
         #expect(model.calls.count == 3)
     }
 
-    @Test func eventAnswerIsRepairedToRecordOnTheCloud() async throws {
+    @Test func eventAnswerIsRepairedToARecordOnTheCloud() async throws {
         let store = try makeMemoryStore()
         let model = FakeModel([
             (#"{"intent":"event","reason":"schedule"}"#, .onDevice),
-            (#"{"intent":"record","reason":"dentist"}"#, .cloud),
-            (#"{"calls":[{"tool":"record_note","args":{"body":"dentist"}}],"missing":[]}"#, .onDevice),
+            (#"{"intent":"record_note","reason":"dentist"}"#, .cloud),
+            (#"{"args":{"body":"dentist"}}"#, .onDevice),
             (#"{"say":"Saved."}"#, .onDevice),
         ])
         let turn = try await make(model, store: store).handle("dentist friday", policy: .auto)
         #expect(turn.say == "Saved.")
         #expect(model.calls.count == 4, "one classify repair, then extract and respond")
         #expect(model.calls[1].policy == .forceCloud)
+    }
+
+    @Test func greetingAsksNothingAndUsesTwoCalls() async throws {
+        let store = try makeMemoryStore()
+        let model = FakeModel([
+            (#"{"intent":"chat","reason":"greeting"}"#, .onDevice),
+            (#"{"say":"Hi! How can I help?"}"#, .onDevice),
+        ])
+        let turn = try await make(model, store: store).handle("I say hi", policy: .forceOnDevice)
+        #expect(turn.say == "Hi! How can I help?")
+        #expect(model.calls.count == 2, "classify and respond only")
+        #expect(try await store.recentNotes(limit: 5).isEmpty)
     }
 
     @Test func unclearMessageAsksWithoutTools() async throws {

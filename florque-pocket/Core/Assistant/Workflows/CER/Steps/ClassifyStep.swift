@@ -53,6 +53,8 @@ nonisolated struct ClassifyStep: CERStepKind {
             s.intent = out.intent
             s.reason = out.reason
             s.problem = ""
+            // A chat message needs no tool: an empty extraction lets the turn go straight to execute.
+            if out.intent == .chat { s.extraction = CERExtraction(calls: [], missing: []) }
         case .rejected(let why):
             s.classifyAttempts += 1
             s.problem = why

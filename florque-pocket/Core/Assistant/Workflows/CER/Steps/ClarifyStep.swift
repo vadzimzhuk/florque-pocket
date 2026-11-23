@@ -57,7 +57,9 @@ nonisolated struct ClarifyStep: CERStepKind {
 
     /// The question used when the model gives no usable one.
     static func fixedQuestion(missing: [String], toolError: String?) -> String {
-        if missing.contains("time") { return "When should it happen? Please give a date and time." }
+        if missing.contains("when") { return "When should it happen? Please give a date and time." }
+        if missing.contains("title") { return "What is the title?" }
+        if missing.contains("body") { return "What should I save?" }
         if let error = toolError { return "I couldn't do that: \(error). Could you rephrase it?" }
         return "What would you like to do: save a note, add an event, or look something up?"
     }

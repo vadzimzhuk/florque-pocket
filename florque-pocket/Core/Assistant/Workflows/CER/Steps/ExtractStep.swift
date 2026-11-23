@@ -1,9 +1,9 @@
 import Foundation
 
-// Purpose: `extract` and its repair. One model call picks the tools for the classified intent and fills their
-// arguments. Only that intent's tools are listed in the prompt, so it stays small. A record_event without a time is
-// not an error here: the parser puts "time" in `missing` and the workflow goes to clarify.
-// Gate: an intent that takes tools (record, retrieve, chat), no extraction yet, and the attempt count matches.
+// Purpose: `extract` and its repair. The classifier has already chosen the tool; one model call fills that tool's
+// arguments only. A required argument left out (for example `when` for an event) is not an error here: the parser
+// reports it in `missing`, and the workflow asks the user.
+// Gate: the intent needs a tool (not chat or unclear), no extraction yet, and the attempt count matches.
 // Reduce: an extraction sets `extraction`; a rejection counts an attempt and keeps the problem.
 //
 // Testing: `CERTests` (extract section) covers each stage on its own.
@@ -14,6 +14,7 @@ nonisolated struct ExtractStep: CERStepKind {
     struct Input: Sendable {
         let turn: CERTurnValues
         let intent: CERIntent
+        let tool: any CERTool
     }
 
     var step: CERStep { repair ? .extractRepair : .extract }
@@ -23,8 +24,9 @@ nonisolated struct ExtractStep: CERStepKind {
         guard let intent = s.intent else {
             return .rejected("the message is not classified")
         }
-        if !(intent == .record || intent == .retrieve || intent == .chat) {
+        guard let tool = CERToolbox.tool(for: intent) else {
             problems.append("the intent \(intent.rawValue) takes no extraction")
+            return .rejected(problems.joined(separator: "; "))
         }
         if s.extraction != nil { problems.append("the message is already extracted") }
         if s.extractAttempts != (repair ? 1 : 0) {
@@ -32,14 +34,15 @@ nonisolated struct ExtractStep: CERStepKind {
         }
         let turn = CERTurnValues(s, repair: repair)
         if let budget = CERModel.budgetProblem(turn) { problems.append(budget) }
-        return problems.isEmpty ? .ok(Input(turn: turn, intent: intent)) : .rejected(problems.joined(separator: "; "))
+        guard problems.isEmpty else { return .rejected(problems.joined(separator: "; ")) }
+        return .ok(Input(turn: turn, intent: intent, tool: tool))
     }
 
     func prompt(_ input: Input) -> ModelPrompt {
         let turn = input.turn
         let system = repair
-            ? CERPrompts.extractRepair(intent: input.intent, now: turn.now, timeZone: turn.timeZone)
-            : CERPrompts.extract(intent: input.intent, now: turn.now, timeZone: turn.timeZone)
+            ? CERPrompts.extractRepair(tool: input.tool, now: turn.now, timeZone: turn.timeZone)
+            : CERPrompts.extract(tool: input.tool, now: turn.now, timeZone: turn.timeZone)
         let user = CERModel.userMessage(turn, lines: repair ? ["PROBLEM: \(turn.problem)"] : [])
         return ModelPrompt(system: system, user: user, policy: turn.policy)
     }
