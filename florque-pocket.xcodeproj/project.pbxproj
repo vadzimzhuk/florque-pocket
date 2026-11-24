@@ -9,9 +9,8 @@
 /* Begin PBXBuildFile section */
 		518EDFF1B41182D895B43E7B /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = 2B0A4747716E786D7F1FD5F4 /* FirebaseAppCheck */; };
 		5D71DD14037D8094D26676EF /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = FCA896AE5EC166A32DA160B3 /* FirebaseAI */; };
-		8A2FE8011FF41B1821DE9700 /* AgentKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE91CD2FAF816F197B15F385 /* AgentKit */; };
+		807CB66630B093260008918A /* AgentKit in Frameworks */ = {isa = PBXBuildFile; productRef = 807CB66530B093260008918A /* AgentKit */; };
 		D5061B57D925161C06D7E85F /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = D59072F9F826D6A21B812EEA /* ExyteChat */; };
-		EDAC028694125FF41960AE6E /* OntologyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3C4BB6403321385A7EF09338 /* OntologyKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,7 +31,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		801B538E30AF7EDB00303831 /* OntologyKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = OntologyKit; sourceTree = "<group>"; };
 		80A285AD30AF566A000A0A5B /* florque-pocket.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "florque-pocket.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		80A285BC30AF566C000A0A5B /* florque-pocketTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "florque-pocketTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		80A285C630AF566C000A0A5B /* florque-pocketUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "florque-pocketUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -41,22 +39,16 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		80A285AF30AF566A000A0A5B /* florque-pocket */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = "florque-pocket";
 			sourceTree = "<group>";
 		};
 		80A285BF30AF566C000A0A5B /* florque-pocketTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = "florque-pocketTests";
 			sourceTree = "<group>";
 		};
 		80A285C930AF566C000A0A5B /* florque-pocketUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = "florque-pocketUITests";
 			sourceTree = "<group>";
 		};
@@ -67,10 +59,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EDAC028694125FF41960AE6E /* OntologyKit in Frameworks */,
 				5D71DD14037D8094D26676EF /* FirebaseAI in Frameworks */,
 				518EDFF1B41182D895B43E7B /* FirebaseAppCheck in Frameworks */,
-				8A2FE8011FF41B1821DE9700 /* AgentKit in Frameworks */,
+				807CB66630B093260008918A /* AgentKit in Frameworks */,
 				D5061B57D925161C06D7E85F /* ExyteChat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -92,12 +83,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		801B538F30AF7EDB00303831 /* Packages */ = {
+		807CB66430B093260008918A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				801B538E30AF7EDB00303831 /* OntologyKit */,
 			);
-			path = Packages;
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		80A285A430AF566A000A0A5B = {
@@ -106,8 +96,8 @@
 				80A285AF30AF566A000A0A5B /* florque-pocket */,
 				80A285BF30AF566C000A0A5B /* florque-pocketTests */,
 				80A285C930AF566C000A0A5B /* florque-pocketUITests */,
+				807CB66430B093260008918A /* Frameworks */,
 				80A285AE30AF566A000A0A5B /* Products */,
-				801B538F30AF7EDB00303831 /* Packages */,
 			);
 			sourceTree = "<group>";
 		};
@@ -141,11 +131,10 @@
 			);
 			name = "florque-pocket";
 			packageProductDependencies = (
-				3C4BB6403321385A7EF09338 /* OntologyKit */,
 				FCA896AE5EC166A32DA160B3 /* FirebaseAI */,
 				2B0A4747716E786D7F1FD5F4 /* FirebaseAppCheck */,
-				FE91CD2FAF816F197B15F385 /* AgentKit */,
 				D59072F9F826D6A21B812EEA /* ExyteChat */,
+				807CB66530B093260008918A /* AgentKit */,
 			);
 			productName = "florque-pocket";
 			productReference = 80A285AD30AF566A000A0A5B /* florque-pocket.app */;
@@ -227,9 +216,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				801B539030AF7F4200303831 /* XCRemoteSwiftPackageReference "agent-kit" */,
-				801B539130AF7F7D00303831 /* XCRemoteSwiftPackageReference "swift-ladybug" */,
 				801B539230AF7FF800303831 /* XCRemoteSwiftPackageReference "Chat" */,
-				9B5E9680CDDFFA16D0EBA728 /* XCLocalSwiftPackageReference "OntologyKit" */,
 				390CDE14BE151F1511A3E9A2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -437,6 +424,7 @@
 				DEVELOPMENT_TEAM = L2HG8KUPMF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "Pocket adds a reminder to Apple Reminders when you accept a task with a time.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -469,6 +457,7 @@
 				DEVELOPMENT_TEAM = L2HG8KUPMF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "Pocket adds a reminder to Apple Reminders when you accept a task with a time.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -616,13 +605,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		9B5E9680CDDFFA16D0EBA728 /* XCLocalSwiftPackageReference "OntologyKit" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = Packages/OntologyKit;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		390CDE14BE151F1511A3E9A2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -635,14 +617,6 @@
 		801B539030AF7F4200303831 /* XCRemoteSwiftPackageReference "agent-kit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "git@github.com:Florque/agent-kit.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-		801B539130AF7F7D00303831 /* XCRemoteSwiftPackageReference "swift-ladybug" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/LadybugDB/swift-ladybug.git";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -664,10 +638,10 @@
 			package = 390CDE14BE151F1511A3E9A2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAppCheck;
 		};
-		3C4BB6403321385A7EF09338 /* OntologyKit */ = {
+		807CB66530B093260008918A /* AgentKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9B5E9680CDDFFA16D0EBA728 /* XCLocalSwiftPackageReference "OntologyKit" */;
-			productName = OntologyKit;
+			package = 801B539030AF7F4200303831 /* XCRemoteSwiftPackageReference "agent-kit" */;
+			productName = AgentKit;
 		};
 		D59072F9F826D6A21B812EEA /* ExyteChat */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -678,11 +652,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 390CDE14BE151F1511A3E9A2 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAI;
-		};
-		FE91CD2FAF816F197B15F385 /* AgentKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 801B539030AF7F4200303831 /* XCRemoteSwiftPackageReference "agent-kit" */;
-			productName = AgentKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
