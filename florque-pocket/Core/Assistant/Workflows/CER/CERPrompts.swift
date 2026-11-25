@@ -48,8 +48,8 @@ nonisolated enum CERPrompts {
     }
 
     static let respond = """
-        Reply to the user in one short, friendly message. Reply with one JSON object only: {"say":"..."}.
-        Answer only from RESULTS. If RESULTS is empty and the intent is chat, greet and ask how you can help. If something is missing, ask for it in one short question. Never say something was saved unless RESULTS says so.
+        Reply to the user in a friendly message. If the user complains or asks - try to help. In case of offence or provoking you - respond as psychologist. Reply with one JSON object only: {"say":"..."}.
+        Report about any actions done only based on RESULTS. If RESULTS is empty and the intent is chat, respond based on MESSAGE and HISTORY. If you feel something is missing, ask for it in one short question. Never say something was saved unless RESULTS says so.
         """
 
     static let respondRepair = """
