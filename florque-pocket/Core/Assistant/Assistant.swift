@@ -34,6 +34,8 @@ public struct AssistantTurn: Sendable, Equatable {
     public var reminderFailed = false
     /// Actions the output gate refused during the turn, as "step: reason". Empty when every step kept its contract.
     public var gateRejections: [String] = []
+    /// What the turn wrote to the graph, so the chat can undo it. Nil when nothing was written.
+    public var changeset: GraphChangeset? = nil
 }
 
 /// Runs one turn through the chosen workflow and owns the task actions the chat needs (accept, dismiss).
@@ -70,6 +72,16 @@ public actor Assistant {
             let eventId = try await reminders.createReminder(title: task.title, due: due)
             try await store.setEventId(eventId, taskId: taskId)
         }
+    }
+
+    /// Reverses one turn's graph writes and removes the reminders it created.
+    public func undo(_ changeset: GraphChangeset, reminders: (any RemindersAdapter)?) async throws {
+        if let reminders {
+            for identifier in changeset.reminderIds {
+                try? await reminders.deleteReminder(identifier: identifier)
+            }
+        }
+        try await store.undo(changeset)
     }
 
     /// Drops a task: it stays in the store but leaves the open list, answers and the digest.

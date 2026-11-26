@@ -41,7 +41,7 @@ nonisolated struct ExecuteStep: CERStepKind {
             }
             do {
                 var result = try await tool.run(call.args, context)
-                if result.items.isEmpty, tool.name.hasPrefix("retrieve_"), call.args["query"] != nil {
+                if result.items.isEmpty, tool.name == "retrieve", call.args["query"] != nil {
                     var broader = call.args
                     broader["query"] = nil
                     result = try await tool.run(broader, context)

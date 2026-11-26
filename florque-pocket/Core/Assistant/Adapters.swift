@@ -38,5 +38,7 @@ public protocol ModelAdapter: Sendable {
 public protocol RemindersAdapter: Sendable {
     /// Creates a reminder and returns its identifier.
     func createReminder(title: String, due: Date) async throws -> String
+    /// Removes a reminder by the identifier `createReminder` returned. Does nothing if it is already gone.
+    func deleteReminder(identifier: String) async throws
 }
 

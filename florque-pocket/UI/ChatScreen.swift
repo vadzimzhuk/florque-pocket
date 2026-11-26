@@ -14,6 +14,11 @@ struct ChatScreen: View {
                 let entryId = params.message.customData["entryId"] as? String ?? ""
                 VStack(alignment: .leading, spacing: 8) {
                     params.defaultMessageView()
+                    if let entry = vm.entries.first(where: { $0.id == entryId }), entry.changeset != nil {
+                        Button("Undo", role: .destructive) { vm.undo(entryId) }
+                            .font(.footnote)
+                            .buttonStyle(.bordered)
+                    }
                     if let entry = vm.entries.first(where: { $0.id == entryId }), !entry.proposals.isEmpty {
                         ForEach(entry.proposals, id: \.id) { proposal in
                             HStack {
@@ -32,6 +37,13 @@ struct ChatScreen: View {
             .setAvailableInputs([.text, .media])
             .navigationTitle("Pocket")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink {
+                        SettingsScreen(store: vm.memoryStore)
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Picker("Route", selection: $vm.policy) {

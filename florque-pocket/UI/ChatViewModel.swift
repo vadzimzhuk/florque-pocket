@@ -9,6 +9,8 @@ struct ChatEntry: Identifiable, Equatable {
     var text: String
     var routeLabel: String = ""
     var proposals: [TaskProposal] = []
+    /// What this reply wrote to the graph. Set only on replies that wrote something; Undo reverses it.
+    var changeset: GraphChangeset? = nil
 }
 
 @MainActor
@@ -26,12 +28,15 @@ final class ChatViewModel {
     /// The one assistant this chat talks to: a backend and a workflow, chosen when the view model is built.
     private let assistant: Assistant
     private let reminders: any RemindersAdapter
+    /// The same store the assistant writes to, for the Settings screen's memory types.
+    let memoryStore: PocketStore
     private let me = User(id: "me", name: "You", avatarURL: nil, isCurrentUser: true)
     private let pocket = User(id: "pocket", name: "Pocket", avatarURL: nil, isCurrentUser: false)
 
-    init(assistant: Assistant, reminders: any RemindersAdapter) {
+    init(assistant: Assistant, reminders: any RemindersAdapter, memoryStore: PocketStore) {
         self.assistant = assistant
         self.reminders = reminders
+        self.memoryStore = memoryStore
     }
 
     /// Builds the chat's assistant from a backend and a workflow. The store and EventKit reminders are the app's own.
@@ -41,8 +46,14 @@ final class ChatViewModel {
         case .firebase: FirebaseModelAdapter()
         }
         let reminders = EventKitReminders()
-        let assistant = Assistant(store: Self.openStore(), model: model, workflow: workflow, reminders: reminders)
-        return ChatViewModel(assistant: assistant, reminders: reminders)
+        let store = Self.openStore()
+        // Default node and edge types exist before anything reads them; the old notes and tasks are copied once.
+        Task {
+            try? await store.seedGraphDefaults()
+            _ = try? await store.importLegacyIfNeeded()
+        }
+        let assistant = Assistant(store: store, model: model, workflow: workflow, reminders: reminders)
+        return ChatViewModel(assistant: assistant, reminders: reminders, memoryStore: store)
     }
 
     /// Application Support file store; falls back to memory so the app still opens (nothing persists then).
@@ -72,7 +83,8 @@ final class ChatViewModel {
             do {
                 let turn = try await target.handle(trimmed, policy: policy, history: history)
                 replace(placeholder.id, with: ChatEntry(id: placeholder.id, isUser: false, text: turn.say,
-                                                        routeLabel: turn.routeLabel, proposals: turn.proposals))
+                                                        routeLabel: turn.routeLabel, proposals: turn.proposals,
+                                                        changeset: turn.changeset))
             } catch {
                 replace(placeholder.id, with: ChatEntry(id: placeholder.id, isUser: false,
                                                         text: "Something went wrong: \(error.localizedDescription)"))
@@ -88,6 +100,22 @@ final class ChatViewModel {
                 entries.append(ChatEntry(id: UUID().uuidString, isUser: false, text: "Accepted: \(proposal.title)"))
             } catch {
                 entries.append(ChatEntry(id: UUID().uuidString, isUser: false, text: "Couldn't accept: \(error.localizedDescription)"))
+            }
+        }
+    }
+
+    /// Reverses the graph writes of one reply, and removes the reminders it made.
+    func undo(_ entryId: String) {
+        guard let i = entries.firstIndex(where: { $0.id == entryId }), let changeset = entries[i].changeset else { return }
+        entries[i].changeset = nil
+        let reminders = reminders
+        let target = assistant
+        Task {
+            do {
+                try await target.undo(changeset, reminders: reminders)
+                entries.append(ChatEntry(id: UUID().uuidString, isUser: false, text: "Undone."))
+            } catch {
+                entries.append(ChatEntry(id: UUID().uuidString, isUser: false, text: "Couldn't undo: \(error.localizedDescription)"))
             }
         }
     }

@@ -29,9 +29,13 @@ class FakeModel: ModelAdapter {
 @MainActor
 class FakeReminders: RemindersAdapter {
     private(set) var created: [(String, Date)] = []
+    private(set) var deleted: [String] = []
     func createReminder(title: String, due: Date) async throws -> String {
         created.append((title, due))
         return "ek-\(created.count)"
+    }
+    func deleteReminder(identifier: String) async throws {
+        deleted.append(identifier)
     }
 }
 

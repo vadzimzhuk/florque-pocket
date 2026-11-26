@@ -40,7 +40,7 @@ struct florque_pocketApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ChatScreen(vm: chat)
+            RootView(chat: chat)
         }
     }
 }

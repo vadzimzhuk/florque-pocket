@@ -40,9 +40,11 @@ nonisolated struct ExtractStep: CERStepKind {
 
     func prompt(_ input: Input) -> ModelPrompt {
         let turn = input.turn
+        // Only the record tool needs the type lists: it chooses node and link types from them.
+        let types = input.tool.name == "record" ? turn.typeBlocks : nil
         let system = repair
-            ? CERPrompts.extractRepair(tool: input.tool, now: turn.now, timeZone: turn.timeZone)
-            : CERPrompts.extract(tool: input.tool, now: turn.now, timeZone: turn.timeZone)
+            ? CERPrompts.extractRepair(tool: input.tool, now: turn.now, timeZone: turn.timeZone, types: types)
+            : CERPrompts.extract(tool: input.tool, now: turn.now, timeZone: turn.timeZone, types: types)
         let user = CERModel.userMessage(turn, lines: repair ? ["PROBLEM: \(turn.problem)"] : [])
         return ModelPrompt(system: system, user: user, policy: turn.policy)
     }

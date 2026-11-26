@@ -28,23 +28,29 @@ nonisolated enum CERPrompts {
         Your last reply was not valid. Reply with only one JSON object: {"intent":"<value>","reason":"<=25 words"}. Values: record_note, record_event, retrieve_notes, retrieve_events, chat, unclear. "event" and "note" alone are not values: use record_event for an event, record_note for a note.
         """
 
-    static func extract(tool: any CERTool, now: Date, timeZone: TimeZone) -> String {
+    static func extract(tool: any CERTool, now: Date, timeZone: TimeZone, types: CERTypeBlocks? = nil) -> String {
         """
         Fill the arguments of one tool for the user's message. Reply with one JSON object only: {"args":{...}}.
         Tool: \(tool.catalogLine)
         Example: \(tool.exampleArgs)
-        Dates are ISO local date-times, e.g. 2026-11-27T09:00:00. Now: \(DateParsing.formatLocal(now, in: timeZone)) (\(timeZone.identifier)).
+        \(typeLines(types))Dates are ISO local date-times, e.g. 2026-11-27T09:00:00. Now: \(DateParsing.formatLocal(now, in: timeZone)) (\(timeZone.identifier)).
         Leave out what the message does not give; do not invent a value.
         """
     }
 
-    static func extractRepair(tool: any CERTool, now: Date, timeZone: TimeZone) -> String {
+    static func extractRepair(tool: any CERTool, now: Date, timeZone: TimeZone, types: CERTypeBlocks? = nil) -> String {
         """
         Your reply was rejected; the reason is in the message. Reply with only one JSON object: {"args":{...}}.
         Tool: \(tool.catalogLine)
         Example: \(tool.exampleArgs)
-        Now: \(DateParsing.formatLocal(now, in: timeZone)) (\(timeZone.identifier)).
+        \(typeLines(types))Now: \(DateParsing.formatLocal(now, in: timeZone)) (\(timeZone.identifier)).
         """
+    }
+
+    /// The allowed node and link types, one per line, when the tool needs them. Empty otherwise.
+    static func typeLines(_ types: CERTypeBlocks?) -> String {
+        guard let types else { return "" }
+        return "Node types (use only these keys):\n\(types.nodes)\nLink types (use only these keys):\n\(types.edges)\n"
     }
 
     static let respond = """

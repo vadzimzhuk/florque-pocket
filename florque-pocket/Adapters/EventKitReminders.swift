@@ -17,4 +17,9 @@ final class EventKitReminders: RemindersAdapter, @unchecked Sendable {
         try store.save(reminder, commit: true)
         return reminder.calendarItemIdentifier
     }
+
+    func deleteReminder(identifier: String) async throws {
+        guard let reminder = store.calendarItem(withIdentifier: identifier) as? EKReminder else { return }
+        try store.remove(reminder, commit: true)
+    }
 }

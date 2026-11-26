@@ -40,6 +40,7 @@ nonisolated struct CERTurnValues: Sendable {
     let timeZone: TimeZone
     let policy: RoutePolicy
     let problem: String
+    let typeBlocks: CERTypeBlocks?
 
     /// A repair goes to the cloud under `auto`, to get a better reply.
     init(_ s: CERState, repair: Bool) {
@@ -50,6 +51,7 @@ nonisolated struct CERTurnValues: Sendable {
         timeZone = s.timeZone
         policy = repair && s.policy == .auto ? .forceCloud : s.policy
         problem = s.problem
+        typeBlocks = s.typeBlocks
     }
 }
 
