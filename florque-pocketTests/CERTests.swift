@@ -499,6 +499,17 @@ private func seededStore() async throws -> PocketStore {
         #expect(model.calls.allSatisfy { $0.policy == .forceOnDevice }, "no CER call may leave the device under auto")
     }
 
+    @Test func recordTurnLabelsWhatWasSaved() async throws {
+        let store = try await seededStore()
+        let model = FakeModel([
+            (#"{"intent":"record_note","reason":"dentist"}"#, .onDevice),
+            (#"{"args":{"nodes":[{"ref":"d","type":"note","title":"Dentist"}]}}"#, .onDevice),
+            (#"{"say":"Saved."}"#, .onDevice),
+        ])
+        let turn = try await make(model, store: store).handle("dentist", policy: .auto)
+        #expect(turn.actionLabel?.hasPrefix("Saved: Dentist") == true)
+    }
+
     @Test func greetingAsksNothingAndUsesTwoCalls() async throws {
         let store = try makeMemoryStore()
         let model = FakeModel([

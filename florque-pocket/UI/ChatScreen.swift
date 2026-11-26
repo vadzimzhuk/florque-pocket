@@ -5,28 +5,35 @@ import ExyteChat
 /// under assistant messages. Swap the library here without touching the view model.
 struct ChatScreen: View {
     @State var vm: ChatViewModel
-    /// The composer's text. Bound to the library's input field so it can be cleared when a message is sent.
-    @State private var inputText = ""
+    /// Changing this rebuilds the chat view, so its composer starts empty. Bumped on every send.
+    @State private var composerId = UUID()
 
     var body: some View {
         NavigationStack {
             ChatView(messages: vm.messages, didSendMessage: { draft in
                 vm.send(draft.text)
-                inputText = ""
+                composerId = UUID()
             }, messageBuilder: { params in
                 let entryId = params.message.customData["entryId"] as? String ?? ""
                 VStack(alignment: .leading, spacing: 8) {
                     params.defaultMessageView()
                     if let entry = vm.entries.first(where: { $0.id == entryId }), entry.changeset != nil {
-                        Button("Undo", role: .destructive) { vm.undo(entryId) }
-                            .font(.footnote)
-                            .buttonStyle(.bordered)
+                        HStack(spacing: 8) {
+                            if let label = entry.actionLabel {
+                                Text(label)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Button("Undo", role: .destructive) { vm.undo(entryId) }
+                                .font(.footnote)
+                                .buttonStyle(.bordered)
+                        }
                     }
                 }
             })
             // Text and media only: without audio, exyte shows the send button, not the mic, when the composer is empty.
             .setAvailableInputs([.text, .media])
-            .inputViewText($inputText)
+            .id(composerId)
             .navigationTitle("Pocket")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {

@@ -38,11 +38,13 @@ nonisolated struct CERWorkflow: TurnWorkflow {
         let final = try await Self.makeGraph(env: env).invoke(state: state, maxSteps: 12)
         Log.debug("cer", "turn end: say=\"\(final.say)\" rejections=\(final.rejections)")
 
+        let written = final.results.filter { $0.changeset != nil }
         return AssistantTurn(say: final.say.isEmpty ? "Done." : final.say,
                              routeLabel: "",
                              noteId: noteId,
                              gateRejections: final.rejections,
-                             changeset: GraphChangeset.combined(final.results.compactMap(\.changeset)))
+                             changeset: GraphChangeset.combined(written.compactMap(\.changeset)),
+                             actionLabel: written.isEmpty ? nil : written.map(\.summary).joined(separator: " "))
     }
 
     /// The graph node for one step: the step's five stages, in order. A refused gate stops the step before any model call.

@@ -17,6 +17,8 @@ public struct AssistantTurn: Sendable, Equatable {
     public var gateRejections: [String] = []
     /// What the turn wrote to the graph, so the chat can undo it. Nil when nothing was written.
     public var changeset: GraphChangeset? = nil
+    /// What the turn recorded, in words (for example "Saved: Dentist"). Nil when nothing was written.
+    public var actionLabel: String? = nil
 }
 
 /// Runs one turn through the chosen workflow and undoes a turn's graph writes.

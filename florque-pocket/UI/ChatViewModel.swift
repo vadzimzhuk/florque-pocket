@@ -12,6 +12,8 @@ struct ChatEntry: Identifiable, Equatable {
     var routeLabel: String = ""
     /// What this reply wrote to the graph. Set only on replies that wrote something; Undo reverses it.
     var changeset: GraphChangeset? = nil
+    /// What the reply recorded, shown beside Undo while Undo is available.
+    var actionLabel: String? = nil
 }
 
 @MainActor
@@ -85,7 +87,8 @@ final class ChatViewModel {
                 let turn = try await target.handle(trimmed, policy: policy, history: history)
                 replace(placeholder.id, with: ChatEntry(id: placeholder.id, isUser: false, text: turn.say,
                                                         routeLabel: turn.routeLabel,
-                                                        changeset: turn.changeset))
+                                                        changeset: turn.changeset,
+                                                        actionLabel: turn.actionLabel))
             } catch {
                 replace(placeholder.id, with: ChatEntry(id: placeholder.id, isUser: false,
                                                         text: "Something went wrong: \(error.localizedDescription)"))
