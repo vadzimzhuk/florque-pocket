@@ -1,25 +1,25 @@
-# Florque Pocket
+# Heed(Florque Pocket)
 
 <p align="center">
   <img src="screenshots/chat.png" alt="Pocket chat screen" width="280">
 </p>
 
-A chat-only iOS journaling app that turns what you say or type into a second brain: notes, events and reminders. Pocket runs its **on the device first** language model, and uses the cloud only when user allows. It is built around one idea: a small model with a tightly managed context window can do real agentic work, if the app decides exactly what each model call gets to see.
+A chat-only iOS journaling app that turns what you say or type into a second brain: notes, events and reminders. Heed runs its **on the device first** language model, and uses the cloud only when user allows. It is built around one idea: a small model with a tightly managed context window can do real agentic work, if the app decides exactly what each model call gets to see.
 
 ## The idea
 
-Most assistants and journaling apps send the whole conversation and the whole data store to one large model on every turn. That is slow, expensive, leaks more data than needed, and wastes context. Pocket takes the opposite approach.
+Most assistants and journaling apps send the whole conversation and the whole data store to one large model on every turn. That is slow, expensive, leaks more data than needed, and wastes context. Heed takes the opposite approach.
 
 - **Small local models first.** Each turn runs on Apple's on-device Foundation Model (`SystemLanguageModel`). Nothing leaves the phone unless it has to.
 - **Cloud only on request.** A chat turn under `auto` stays on the device, so person and feeling content never reaches the cloud. The cloud route (Gemini through Firebase AI Logic) is used only when the developer picks cloud explicitly.
-- **Small, typed model calls.** A local model has a small window (the budget code assumes about 15,000 tokens). Pocket never sends a whole chat or a whole database. Each step builds a short prompt from a typed input, and every variable part is capped before it reaches the prompt.
+- **Small, typed model calls.** A local model has a small window (the budget code assumes about 15,000 tokens). Heed never sends a whole chat or a whole database. Each step builds a short prompt from a typed input, and every variable part is capped before it reaches the prompt.
 - **Agentic workflow with bounded loops.** A turn is a graph of small steps (classify, extract, execute, respond, clarify) with explicit repair paths. Every loop is bounded by counters in the state, and the graph has a hard step limit, so a confused model cannot run away.
 
 ## Screens
 
 <p align="center">
   <img src="screenshots/route-menu.png" alt="Route menu: Auto, On-device only, Cloud only" width="240">
-  <img src="screenshots/chat.png" alt="Pocket chat screen" width="240">
+  <img src="screenshots/chat.png" alt="Heed chat screen" width="240">
   <img src="screenshots/memory.png" alt="Memory tab: entries with their type and link count" width="240">
   <img src="screenshots/settings-memory.png" alt="Settings: Memory node and link types, with on-device flags" width="240">
 </p>
