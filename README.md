@@ -4,11 +4,11 @@
   <img src="screenshots/chat.png" alt="Pocket chat screen" width="280">
 </p>
 
-A chat-only iOS assistant that turns what you say or type into a second brain: notes, events and reminders. Pocket runs its **on the device first** language model, and uses the cloud only when user allows. It is built around one idea: a small model with a tightly managed context window can do real agentic work, if the app decides exactly what each model call gets to see.
+A chat-only iOS journaling app that turns what you say or type into a second brain: notes, events and reminders. Pocket runs its **on the device first** language model, and uses the cloud only when user allows. It is built around one idea: a small model with a tightly managed context window can do real agentic work, if the app decides exactly what each model call gets to see.
 
 ## The idea
 
-Most assistants send the whole conversation and the whole data store to one large model on every turn. That is slow, expensive, leaks more data than needed, and wastes context. Pocket takes the opposite approach.
+Most assistants and journaling apps send the whole conversation and the whole data store to one large model on every turn. That is slow, expensive, leaks more data than needed, and wastes context. Pocket takes the opposite approach.
 
 - **Small local models first.** Each turn runs on Apple's on-device Foundation Model (`SystemLanguageModel`). Nothing leaves the phone unless it has to.
 - **Cloud only on request.** A chat turn under `auto` stays on the device, so person and feeling content never reaches the cloud. The cloud route (Gemini through Firebase AI Logic) is used only when the developer picks cloud explicitly.
