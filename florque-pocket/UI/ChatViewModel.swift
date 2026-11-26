@@ -7,6 +7,8 @@ struct ChatEntry: Identifiable, Equatable {
     let id: String
     let isUser: Bool
     var text: String
+    /// Fixed when the entry is made, so the chat's message dates do not change on every render.
+    var createdAt = Date()
     var routeLabel: String = ""
     /// What this reply wrote to the graph. Set only on replies that wrote something; Undo reverses it.
     var changeset: GraphChangeset? = nil
@@ -114,7 +116,7 @@ final class ChatViewModel {
         entries.map { e in
             var text = e.text
             if !e.routeLabel.isEmpty { text += "\n\(e.routeLabel)" }
-            return Message(id: e.id, user: e.isUser ? me : pocket, createdAt: Date(), text: text,
+            return Message(id: e.id, user: e.isUser ? me : pocket, createdAt: e.createdAt, text: text,
                            customData: ["entryId": e.id])
         }
     }
@@ -122,6 +124,10 @@ final class ChatViewModel {
     // MARK: helpers
 
     private func replace(_ id: String, with entry: ChatEntry) {
-        if let i = entries.firstIndex(where: { $0.id == id }) { entries[i] = entry }
+        if let i = entries.firstIndex(where: { $0.id == id }) {
+            var kept = entry
+            kept.createdAt = entries[i].createdAt
+            entries[i] = kept
+        }
     }
 }

@@ -25,7 +25,7 @@ nonisolated struct ClassifyStep: CERStepKind {
             if s.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { problems.append("the message is empty") }
             if s.classifyAttempts != 0 { problems.append("the classifier already ran") }
         }
-        let turn = CERTurnValues(s, repair: repair)
+        let turn = CERTurnValues(s)
         if let budget = CERModel.budgetProblem(turn) { problems.append(budget) }
         return problems.isEmpty ? .ok(Input(turn: turn)) : .rejected(problems.joined(separator: "; "))
     }

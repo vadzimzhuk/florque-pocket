@@ -24,7 +24,7 @@ nonisolated struct ExecuteStep: CERStepKind {
         guard let extraction = s.extraction, problems.isEmpty else {
             return .rejected(problems.joined(separator: "; "))
         }
-        return .ok(Input(extraction: extraction, turn: CERTurnValues(s, repair: false)))
+        return .ok(Input(extraction: extraction, turn: CERTurnValues(s)))
     }
 
     func prompt(_ input: Input) -> NoPrompt {

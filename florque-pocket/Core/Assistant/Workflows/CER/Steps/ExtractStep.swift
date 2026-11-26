@@ -32,7 +32,7 @@ nonisolated struct ExtractStep: CERStepKind {
         if s.extractAttempts != (repair ? 1 : 0) {
             problems.append(repair ? "the repair runs once, after one failed extraction" : "the extraction already ran")
         }
-        let turn = CERTurnValues(s, repair: repair)
+        let turn = CERTurnValues(s)
         if let budget = CERModel.budgetProblem(turn) { problems.append(budget) }
         guard problems.isEmpty else { return .rejected(problems.joined(separator: "; ")) }
         return .ok(Input(turn: turn, intent: intent, tool: tool))

@@ -88,14 +88,14 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
     @Test func repairGateRunsOnlyAfterOneFailure() {
         var s = cerState()
         #expect(reason(ClassifyStep(repair: true).gate(s)) != nil)
-        s = ClassifyStep(repair: false).reduce(s, ClassifyStep.Input(turn: CERTurnValues(s, repair: false)),
+        s = ClassifyStep(repair: false).reduce(s, ClassifyStep.Input(turn: CERTurnValues(s)),
                                                .rejected("bad"))
         #expect(unwrap(ClassifyStep(repair: true).gate(s)) != nil)
     }
 
     @Test func classifyPromptSaysEventIsNotAnIntentAndGivesAnExamplePerIntent() {
         let system = ClassifyStep(repair: false).prompt(
-            ClassifyStep.Input(turn: CERTurnValues(cerState(), repair: false))).system
+            ClassifyStep.Input(turn: CERTurnValues(cerState()))).system
         #expect(system.contains(#""event" and "note" are not values."#))
         for example in [#""hi" -> chat"#, #""Wifi code is 4411" -> record_note"#, #""What events do I have tomorrow?" -> retrieve_events"#, #""tomorrow" -> unclear"#] {
             #expect(system.contains(example))
@@ -104,7 +104,7 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
 
     @Test func classifyRepairPromptNamesTheMistake() {
         let system = ClassifyStep(repair: true).prompt(
-            ClassifyStep.Input(turn: CERTurnValues(cerState(), repair: true))).system
+            ClassifyStep.Input(turn: CERTurnValues(cerState()))).system
         #expect(system.contains(#""event" and "note" alone are not values"#))
     }
 
@@ -134,7 +134,7 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
 
     @Test func reduceSetsTheIntentAndRefusesASecondOne() throws {
         let s = cerState()
-        let input = ClassifyStep.Input(turn: CERTurnValues(s, repair: false))
+        let input = ClassifyStep.Input(turn: CERTurnValues(s))
         let step = ClassifyStep(repair: false)
         let once = step.reduce(s, input, .ok(CERClassifyOutput(intent: .recordNote, reason: "a")))
         #expect(once.intent == .recordNote)
@@ -145,7 +145,7 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
 
     @Test func reduceCountsAFailedAttemptAndKeepsTheProblem() {
         let s = cerState()
-        let input = ClassifyStep.Input(turn: CERTurnValues(s, repair: false))
+        let input = ClassifyStep.Input(turn: CERTurnValues(s))
         let after = ClassifyStep(repair: false).reduce(s, input, .rejected("no JSON"))
         #expect(after.classifyAttempts == 1)
         #expect(after.problem == "no JSON")
@@ -156,7 +156,7 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
 
 @Suite @MainActor struct CERExtractStepTests {
     private func classified(_ intent: CERIntent, _ text: String = "x") -> CERState {
-        ClassifyStep(repair: false).reduce(cerState(text), ClassifyStep.Input(turn: CERTurnValues(cerState(text), repair: false)),
+        ClassifyStep(repair: false).reduce(cerState(text), ClassifyStep.Input(turn: CERTurnValues(cerState(text))),
                                            .ok(CERClassifyOutput(intent: intent, reason: "r")))
     }
 
@@ -190,7 +190,7 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
 
     @Test func reduceCountsAFailedExtraction() {
         let s = classified(.recordNote)
-        let input = ExtractStep.Input(turn: CERTurnValues(s, repair: false), intent: .recordNote, tool: RecordTool())
+        let input = ExtractStep.Input(turn: CERTurnValues(s), intent: .recordNote, tool: RecordTool())
         let after = ExtractStep(repair: false).reduce(s, input, .rejected("bad args"))
         #expect(after.extractAttempts == 1)
         #expect(after.problem == "bad args")
@@ -202,9 +202,9 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
 @Suite @MainActor struct CERExecuteStepTests {
     @Test func gateRefusesWhileSomethingIsMissing() {
         var s = cerState()
-        s = ClassifyStep(repair: false).reduce(s, ClassifyStep.Input(turn: CERTurnValues(s, repair: false)),
+        s = ClassifyStep(repair: false).reduce(s, ClassifyStep.Input(turn: CERTurnValues(s)),
                                                .ok(CERClassifyOutput(intent: .recordEvent, reason: "e")))
-        s = ExtractStep(repair: false).reduce(s, ExtractStep.Input(turn: CERTurnValues(s, repair: false), intent: .recordEvent,
+        s = ExtractStep(repair: false).reduce(s, ExtractStep.Input(turn: CERTurnValues(s), intent: .recordEvent,
                                                                    tool: RecordTool()),
                                               .ok(CERExtraction(calls: [], missing: ["when"])))
         #expect(reason(ExecuteStep().gate(s)) != nil)
@@ -216,7 +216,7 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
         let s = cerState("milk")
         let call = CERCall(tool: "record", args: ["nodes": .array([.object(["ref": .string("m"), "type": .string("note"), "title": .string("milk")])])])
         let input = ExecuteStep.Input(extraction: CERExtraction(calls: [call], missing: []),
-                                      turn: CERTurnValues(s, repair: false))
+                                      turn: CERTurnValues(s))
         let step = ExecuteStep()
         let results = await step.process(NoPrompt(), input, env)
         #expect(unwrap(results)?.count == 1)
@@ -228,14 +228,14 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
         let s = cerState()
         let call = CERCall(tool: "no_such_tool", args: [:])
         let input = ExecuteStep.Input(extraction: CERExtraction(calls: [call], missing: []),
-                                      turn: CERTurnValues(s, repair: false))
+                                      turn: CERTurnValues(s))
         #expect(reason(await ExecuteStep().process(NoPrompt(), input, env)) != nil)
     }
 
     @Test func reduceKeepsAToolErrorForTheClarifyStep() {
         let s = cerState()
         let input = ExecuteStep.Input(extraction: CERExtraction(calls: [], missing: []),
-                                      turn: CERTurnValues(s, repair: false))
+                                      turn: CERTurnValues(s))
         let after = ExecuteStep().reduce(s, input, .rejected("record: bad time"))
         #expect(after.executed)
         #expect(after.toolError == "record: bad time")
@@ -264,19 +264,19 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
     }
 
     @Test func parseAcceptsProse() {
-        let input = RespondStep.Input(turn: CERTurnValues(executed(), repair: false), results: [], resultsText: "")
+        let input = RespondStep.Input(turn: CERTurnValues(executed()), results: [], resultsText: "")
         #expect(unwrap(RespondStep(repair: false).parse("Saved it.", input)) == "Saved it.")
     }
 
     @Test func reduceSetsTheReply() {
         let s = executed()
-        let input = RespondStep.Input(turn: CERTurnValues(s, repair: false), results: [], resultsText: "")
+        let input = RespondStep.Input(turn: CERTurnValues(s), results: [], resultsText: "")
         #expect(RespondStep(repair: false).reduce(s, input, .ok("Hi!")).say == "Hi!")
     }
 
     @Test func repairThatStillFailsAnswersFromTheResultsInCode() {
         let s = executed([CERToolResult(tool: "record_note", items: [], summary: "Saved note: milk")])
-        let input = RespondStep.Input(turn: CERTurnValues(s, repair: true), results: s.results, resultsText: "")
+        let input = RespondStep.Input(turn: CERTurnValues(s), results: s.results, resultsText: "")
         let after = RespondStep(repair: true).reduce(s, input, .rejected("not JSON"))
         #expect(after.say == "Saved note: milk")
     }
@@ -295,7 +295,7 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
     @Test func fallbackAsksForTheMissingTime() {
         var s = cerState()
         s.extraction = CERExtraction(calls: [], missing: ["when"])
-        let input = ClarifyStep.Input(turn: CERTurnValues(s, repair: false), missing: ["when"], toolError: nil, intent: .recordEvent)
+        let input = ClarifyStep.Input(turn: CERTurnValues(s), missing: ["when"], toolError: nil, intent: .recordEvent)
         let after = ClarifyStep().reduce(s, input, .rejected("the model call failed"))
         #expect(after.question == "When should it happen? Please give a date and time.")
         #expect(after.say == after.question)
@@ -324,6 +324,21 @@ private func reason<T>(_ checked: Checked<T>) -> String? {
 }
 
 // MARK: - Budget
+
+/// Privacy: a CER turn under `auto` never asks for the cloud, so repairs cannot send feelings or people to Gemini.
+@Suite @MainActor struct CERRoutingPrivacyTests {
+    private func state(_ policy: RoutePolicy) -> CERState {
+        CERState(text: "hi", history: [], policy: policy, now: cerNow, noteId: "note-1", timeZone: utc)
+    }
+
+    @Test func autoTurnsStayOnDeviceForEveryStep() {
+        #expect(CERTurnValues(state(.auto)).policy == .forceOnDevice)
+    }
+
+    @Test func explicitCloudIsStillHonoured() {
+        #expect(CERTurnValues(state(.forceCloud)).policy == .forceCloud)
+    }
+}
 
 @Suite struct CERBudgetTests {
     @Test func worstCaseInputStaysUnderTheLimit() {
@@ -470,18 +485,18 @@ private func seededStore() async throws -> PocketStore {
         #expect(model.calls.count == 3)
     }
 
-    @Test func eventAnswerIsRepairedToARecordOnTheCloud() async throws {
+    @Test func eventAnswerIsRepairedToARecordOnTheDevice() async throws {
         let store = try await seededStore()
         let model = FakeModel([
             (#"{"intent":"event","reason":"schedule"}"#, .onDevice),
-            (#"{"intent":"record_note","reason":"dentist"}"#, .cloud),
+            (#"{"intent":"record_note","reason":"dentist"}"#, .onDevice),
             (#"{"args":{"nodes":[{"ref":"d","type":"note","title":"Dentist"}]}}"#, .onDevice),
             (#"{"say":"Saved."}"#, .onDevice),
         ])
         let turn = try await make(model, store: store).handle("dentist friday", policy: .auto)
         #expect(turn.say == "Saved.")
         #expect(model.calls.count == 4, "one classify repair, then extract and respond")
-        #expect(model.calls[1].policy == .forceCloud)
+        #expect(model.calls.allSatisfy { $0.policy == .forceOnDevice }, "no CER call may leave the device under auto")
     }
 
     @Test func greetingAsksNothingAndUsesTwoCalls() async throws {

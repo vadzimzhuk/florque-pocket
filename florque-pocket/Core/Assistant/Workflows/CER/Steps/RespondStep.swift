@@ -27,7 +27,7 @@ nonisolated struct RespondStep: CERStepKind {
         if s.respondAttempts != (repair ? 1 : 0) {
             problems.append(repair ? "the repair runs once, after one failed reply" : "the reply already failed once")
         }
-        let turn = CERTurnValues(s, repair: repair)
+        let turn = CERTurnValues(s)
         if let budget = CERModel.budgetProblem(turn, results: s.resultsText) { problems.append(budget) }
 
         guard problems.isEmpty else { return .rejected(problems.joined(separator: "; ")) }
