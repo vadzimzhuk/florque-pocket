@@ -4,7 +4,7 @@
   <img src="screenshots/chat.png" alt="Pocket chat screen" width="280">
 </p>
 
-A chat-only iOS assistant that turns what you say or type into saved notes, events and reminders. Pocket runs its language model on the device first, and uses the cloud only when the local model cannot finish the job. It is built around one idea: a small model with a tightly managed context window can do real agentic work, if the app decides exactly what each model call gets to see.
+A chat-only iOS assistant that turns what you say or type into a second brain: notes, events and reminders. Pocket runs its **on the device first** language model, and uses the cloud only when user allows. It is built around one idea: a small model with a tightly managed context window can do real agentic work, if the app decides exactly what each model call gets to see.
 
 ## The idea
 
@@ -53,6 +53,8 @@ Nothing is written by the model directly. The model proposes memory points as JS
 ## Context and app state management
 
 The main engineering problem is not "call a model". It is deciding what the model needs right now, and nothing more.
+
+**Multi-agent graph instead of agentic loop.** Agentic workflow breaking task into multiple steps allows to break context into task specific pieces and utilize small model context window efficiently.
 
 **One value of state per turn.** `CERState` is a plain Swift value. Each step reads it through a gatekeeper and can change it only through its own reducer. Nothing else writes to it, so every change is traceable.
 
@@ -198,7 +200,3 @@ florque-pocket/                     repository root
 3. Run on an iOS device or simulator with Apple Intelligence enabled for the on-device route. The `firebase` backend and the cloud route need network access and a Firebase project with AI Logic enabled.
 
 To build with Private Cloud Compute, set `POCKET_PCC` in the build settings, with an SDK that provides `PrivateCloudComputeLanguageModel`. Without it, cloud calls on the Apple backend fail with a clear message.
-
-## Status
-
-The `cer` workflow is the only workflow; the earlier `intent` workflow was removed. Scope and open work are tracked in `docs/pocket-scope-v2.md` and `docs/pocket-engineering-plan.md`.
