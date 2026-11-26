@@ -5,33 +5,37 @@ import ExyteChat
 /// under assistant messages. Swap the library here without touching the view model.
 struct ChatScreen: View {
     @State var vm: ChatViewModel
+    /// The composer's text. Bound to the library's input field so it can be cleared when a message is sent.
+    @State private var inputText = ""
 
     var body: some View {
         NavigationStack {
             ChatView(messages: vm.messages, didSendMessage: { draft in
                 vm.send(draft.text)
+                inputText = ""
             }, messageBuilder: { params in
                 let entryId = params.message.customData["entryId"] as? String ?? ""
                 VStack(alignment: .leading, spacing: 8) {
                     params.defaultMessageView()
-                    if let entry = vm.entries.first(where: { $0.id == entryId }), !entry.proposals.isEmpty {
-                        ForEach(entry.proposals, id: \.id) { proposal in
-                            HStack {
-                                Text(proposal.title).font(.footnote)
-                                Spacer()
-                                Button("Dismiss") { vm.dismiss(proposal, in: entryId) }
-                                    .buttonStyle(.bordered)
-                                Button("Accept") { vm.accept(proposal, in: entryId) }
-                                    .buttonStyle(.borderedProminent)
-                            }
-                        }
+                    if let entry = vm.entries.first(where: { $0.id == entryId }), entry.changeset != nil {
+                        Button("Undo", role: .destructive) { vm.undo(entryId) }
+                            .font(.footnote)
+                            .buttonStyle(.bordered)
                     }
                 }
             })
             // Text and media only: without audio, exyte shows the send button, not the mic, when the composer is empty.
             .setAvailableInputs([.text, .media])
+            .inputViewText($inputText)
             .navigationTitle("Pocket")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink {
+                        SettingsScreen(store: vm.memoryStore)
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Picker("Route", selection: $vm.policy) {

@@ -8,9 +8,7 @@ import Foundation
 
 /// Every turn workflow the app can run. Add a case here and in `WorkflowFactory.make`.
 nonisolated enum WorkflowID: String, Sendable, CaseIterable {
-    /// Classify the intent first, then one step per intent: save a note, extract a task, answer, or clarify.
-    case intent
-    /// Classify, extract tool calls, run them, then respond. Tools: record and retrieve notes and events.
+    /// Classify, extract tool calls, run them, then respond. Tools: record and retrieve memory nodes and links.
     case cer
 }
 
@@ -25,25 +23,13 @@ nonisolated protocol TurnWorkflow: Sendable {
 nonisolated struct TurnDeps: Sendable {
     let store: PocketStore
     let model: any ModelAdapter
-    let prompts: PromptSet
     let reminders: (any RemindersAdapter)?
     let timeZone: TimeZone
-
-    /// Prompt inputs for the current store state: open tasks and recent notes, as the digest shows them.
-    func promptContext(noteId: String, now: Date) async throws -> PromptContext {
-        let tasks = try await store.openTasks()
-        let notes = try await store.recentNotes(limit: 20)
-        return PromptContext(now: now,
-                             timeZone: timeZone,
-                             digest: Digest.build(tasks: tasks, notes: notes, timeZone: timeZone),
-                             noteId: noteId)
-    }
 }
 
 nonisolated enum WorkflowFactory {
     static func make(_ id: WorkflowID, deps: TurnDeps) -> any TurnWorkflow {
         switch id {
-        case .intent: IntentWorkflow(deps: deps)
         case .cer: CERWorkflow(deps: deps)
         }
     }

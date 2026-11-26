@@ -7,8 +7,11 @@ struct ChatEntry: Identifiable, Equatable {
     let id: String
     let isUser: Bool
     var text: String
+    /// Fixed when the entry is made, so the chat's message dates do not change on every render.
+    var createdAt = Date()
     var routeLabel: String = ""
-    var proposals: [TaskProposal] = []
+    /// What this reply wrote to the graph. Set only on replies that wrote something; Undo reverses it.
+    var changeset: GraphChangeset? = nil
 }
 
 @MainActor
@@ -26,12 +29,15 @@ final class ChatViewModel {
     /// The one assistant this chat talks to: a backend and a workflow, chosen when the view model is built.
     private let assistant: Assistant
     private let reminders: any RemindersAdapter
+    /// The same store the assistant writes to, for the Settings screen's memory types.
+    let memoryStore: PocketStore
     private let me = User(id: "me", name: "You", avatarURL: nil, isCurrentUser: true)
     private let pocket = User(id: "pocket", name: "Pocket", avatarURL: nil, isCurrentUser: false)
 
-    init(assistant: Assistant, reminders: any RemindersAdapter) {
+    init(assistant: Assistant, reminders: any RemindersAdapter, memoryStore: PocketStore) {
         self.assistant = assistant
         self.reminders = reminders
+        self.memoryStore = memoryStore
     }
 
     /// Builds the chat's assistant from a backend and a workflow. The store and EventKit reminders are the app's own.
@@ -41,8 +47,14 @@ final class ChatViewModel {
         case .firebase: FirebaseModelAdapter()
         }
         let reminders = EventKitReminders()
-        let assistant = Assistant(store: Self.openStore(), model: model, workflow: workflow, reminders: reminders)
-        return ChatViewModel(assistant: assistant, reminders: reminders)
+        let store = Self.openStore()
+        // Default node and edge types exist before anything reads them; the old notes and tasks are copied once.
+        Task {
+            try? await store.seedGraphDefaults()
+            _ = try? await store.importLegacyIfNeeded()
+        }
+        let assistant = Assistant(store: store, model: model, workflow: workflow, reminders: reminders)
+        return ChatViewModel(assistant: assistant, reminders: reminders, memoryStore: store)
     }
 
     /// Application Support file store; falls back to memory so the app still opens (nothing persists then).
@@ -72,7 +84,8 @@ final class ChatViewModel {
             do {
                 let turn = try await target.handle(trimmed, policy: policy, history: history)
                 replace(placeholder.id, with: ChatEntry(id: placeholder.id, isUser: false, text: turn.say,
-                                                        routeLabel: turn.routeLabel, proposals: turn.proposals))
+                                                        routeLabel: turn.routeLabel,
+                                                        changeset: turn.changeset))
             } catch {
                 replace(placeholder.id, with: ChatEntry(id: placeholder.id, isUser: false,
                                                         text: "Something went wrong: \(error.localizedDescription)"))
@@ -80,24 +93,22 @@ final class ChatViewModel {
         }
     }
 
-    func accept(_ proposal: TaskProposal, in entryId: String) {
+    /// Reverses the graph writes of one reply, and removes the reminders it made.
+    func undo(_ entryId: String) {
+        guard let i = entries.firstIndex(where: { $0.id == entryId }), let changeset = entries[i].changeset else { return }
+        entries[i].changeset = nil
+        let reminders = reminders
+        let target = assistant
         Task {
             do {
-                try await assistant.accept(taskId: proposal.id, reminders: reminders)
-                removeProposal(proposal.id, from: entryId)
-                entries.append(ChatEntry(id: UUID().uuidString, isUser: false, text: "Accepted: \(proposal.title)"))
+                try await target.undo(changeset, reminders: reminders)
+                entries.append(ChatEntry(id: UUID().uuidString, isUser: false, text: "Undone."))
             } catch {
-                entries.append(ChatEntry(id: UUID().uuidString, isUser: false, text: "Couldn't accept: \(error.localizedDescription)"))
+                entries.append(ChatEntry(id: UUID().uuidString, isUser: false, text: "Couldn't undo: \(error.localizedDescription)"))
             }
         }
     }
 
-    func dismiss(_ proposal: TaskProposal, in entryId: String) {
-        Task {
-            try? await assistant.dismiss(taskId: proposal.id)
-            removeProposal(proposal.id, from: entryId)
-        }
-    }
 
     // MARK: exyte mapping
 
@@ -105,7 +116,7 @@ final class ChatViewModel {
         entries.map { e in
             var text = e.text
             if !e.routeLabel.isEmpty { text += "\n\(e.routeLabel)" }
-            return Message(id: e.id, user: e.isUser ? me : pocket, createdAt: Date(), text: text,
+            return Message(id: e.id, user: e.isUser ? me : pocket, createdAt: e.createdAt, text: text,
                            customData: ["entryId": e.id])
         }
     }
@@ -113,11 +124,10 @@ final class ChatViewModel {
     // MARK: helpers
 
     private func replace(_ id: String, with entry: ChatEntry) {
-        if let i = entries.firstIndex(where: { $0.id == id }) { entries[i] = entry }
-    }
-
-    private func removeProposal(_ taskId: String, from entryId: String) {
-        guard let i = entries.firstIndex(where: { $0.id == entryId }) else { return }
-        entries[i].proposals.removeAll { $0.id == taskId }
+        if let i = entries.firstIndex(where: { $0.id == id }) {
+            var kept = entry
+            kept.createdAt = entries[i].createdAt
+            entries[i] = kept
+        }
     }
 }

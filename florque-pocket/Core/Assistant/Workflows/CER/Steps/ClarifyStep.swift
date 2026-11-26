@@ -22,7 +22,7 @@ nonisolated struct ClarifyStep: CERStepKind {
         if s.question != nil { problems.append("the question was already asked") }
         if !s.needsQuestion { problems.append("nothing needs a question") }
         guard problems.isEmpty else { return .rejected(problems.joined(separator: "; ")) }
-        return .ok(Input(turn: CERTurnValues(s, repair: false), missing: s.missing, toolError: s.toolError,
+        return .ok(Input(turn: CERTurnValues(s), missing: s.missing, toolError: s.toolError,
                          intent: s.intent))
     }
 

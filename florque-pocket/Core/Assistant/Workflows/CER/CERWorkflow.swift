@@ -26,8 +26,13 @@ nonisolated struct CERWorkflow: TurnWorkflow {
 
     func run(_ text: String, policy: RoutePolicy, now: Date, noteId: String, history: [String]) async throws -> AssistantTurn {
         let env = CEREnv(model: deps.model, store: deps.store, reminders: deps.reminders)
-        let state = CERState(text: text, history: TokenBudget.history(history), policy: policy, now: now,
+        var state = CERState(text: text, history: TokenBudget.history(history), policy: policy, now: now,
                              noteId: noteId, timeZone: deps.timeZone)
+        // The enabled node and link types for this message, so the record tool only chooses from them.
+        let snapshot = try await deps.store.snapshot()
+        state.typeBlocks = CERTypeBlocks(
+            nodes: GraphPromptBlocks.nodeTypesBlock(snapshot.nodeTypes, message: text),
+            edges: GraphPromptBlocks.edgeTypesBlock(snapshot.edgeTypes, nodeTypes: snapshot.nodeTypes, message: text))
         Log.debug("cer", "turn start: \"\(text)\" policy=\(policy.rawValue) history=\(state.history.count)")
 
         let final = try await Self.makeGraph(env: env).invoke(state: state, maxSteps: 12)
@@ -35,13 +40,9 @@ nonisolated struct CERWorkflow: TurnWorkflow {
 
         return AssistantTurn(say: final.say.isEmpty ? "Done." : final.say,
                              routeLabel: "",
-                             proposals: [],
                              noteId: noteId,
-                             savedOnly: false,
-                             intents: [],
-                             taskIds: [],
-                             reminderFailed: false,
-                             gateRejections: final.rejections)
+                             gateRejections: final.rejections,
+                             changeset: GraphChangeset.combined(final.results.compactMap(\.changeset)))
     }
 
     /// The graph node for one step: the step's five stages, in order. A refused gate stops the step before any model call.

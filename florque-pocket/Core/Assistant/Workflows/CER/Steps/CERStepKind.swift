@@ -40,16 +40,19 @@ nonisolated struct CERTurnValues: Sendable {
     let timeZone: TimeZone
     let policy: RoutePolicy
     let problem: String
+    let typeBlocks: CERTypeBlocks?
 
-    /// A repair goes to the cloud under `auto`, to get a better reply.
-    init(_ s: CERState, repair: Bool) {
+    /// `auto` stays on the device for CER turns: person and feeling content must not reach the cloud. Only an
+    /// explicit developer choice of cloud sends a turn there.
+    init(_ s: CERState) {
         text = s.text
         history = s.history
         reason = s.reason
         now = s.now
         timeZone = s.timeZone
-        policy = repair && s.policy == .auto ? .forceCloud : s.policy
+        policy = s.policy == .auto ? .forceOnDevice : s.policy
         problem = s.problem
+        typeBlocks = s.typeBlocks
     }
 }
 

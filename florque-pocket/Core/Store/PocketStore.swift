@@ -29,13 +29,39 @@ public struct NewTask: Sendable, Equatable {
 public actor PocketStore {
     /// A file-backed container for the app. Items persist across launches.
     public static func fileContainer(url: URL) throws -> ModelContainer {
-        try ModelContainer(for: Note.self, PocketTask.self, configurations: ModelConfiguration(url: url))
+        try ModelContainer(for: Schema(storeModels), configurations: ModelConfiguration(url: url))
     }
 
     /// An in-memory container for tests and previews. Nothing is kept after it is released.
     public static func memoryContainer() throws -> ModelContainer {
-        try ModelContainer(for: Note.self, PocketTask.self,
-                           configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        try ModelContainer(for: Schema(storeModels), configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+    }
+
+    /// Every model the store holds. Add new models here and nowhere else.
+    static var storeModels: [any PersistentModel.Type] {
+        [Note.self, PocketTask.self, NodeType.self, Node.self, EdgeType.self, Edge.self]
+    }
+
+    // MARK: graph defaults
+
+    /// Inserts the default node and edge types whose keys are not yet stored. Existing types, including edits the
+    /// user made to them, are left alone, so calling this on every launch is safe.
+    public func seedGraphDefaults() throws {
+        let existingNodeKeys = Set(try modelContext.fetch(FetchDescriptor<NodeType>()).map(\.key))
+        let existingEdgeKeys = Set(try modelContext.fetch(FetchDescriptor<EdgeType>()).map(\.key))
+        try commit {
+            for spec in GraphDefaults.nodeTypes where !existingNodeKeys.contains(spec.key) {
+                modelContext.insert(NodeType(key: spec.key, name: spec.name, typeDescription: spec.typeDescription,
+                                             onDeviceOnly: spec.onDeviceOnly, schedulesReminder: spec.schedulesReminder,
+                                             isDefault: true, sortOrder: spec.sortOrder))
+            }
+            for spec in GraphDefaults.edgeTypes where !existingEdgeKeys.contains(spec.key) {
+                modelContext.insert(EdgeType(key: spec.key, name: spec.name, inverseName: spec.inverseName,
+                                             typeDescription: spec.typeDescription,
+                                             fromNodeKeys: spec.fromNodeKeys, toNodeKeys: spec.toNodeKeys,
+                                             symmetric: spec.symmetric, isDefault: true, sortOrder: spec.sortOrder))
+            }
+        }
     }
 
     // MARK: reads
@@ -149,7 +175,7 @@ public actor PocketStore {
     // MARK: helpers
 
     /// Runs the changes and saves once. Any throw rolls the context back, so nothing from the batch lands.
-    private func commit(_ changes: () throws -> Void) throws {
+    func commit(_ changes: () throws -> Void) throws {
         do {
             try changes()
             try modelContext.save()

@@ -11,6 +11,12 @@ nonisolated enum CERStep: String, Sendable, CaseIterable {
     case classify, classifyRepair, extract, extractRepair, execute, respond, respondRepair, clarify
 }
 
+/// The node and link type lists the record tool may use, as prompt lines (see `GraphPromptBlocks`).
+nonisolated struct CERTypeBlocks: Sendable, Equatable {
+    let nodes: String
+    let edges: String
+}
+
 /// A checked extraction: tool calls to run, and the arguments the user still has to give (for example "when").
 nonisolated struct CERExtraction: Sendable, Equatable {
     let calls: [CERCall]
@@ -32,6 +38,8 @@ nonisolated struct CERState: Sendable {
     var extraction: CERExtraction?
     var executed = false
     var results: [CERToolResult] = []
+    /// The enabled node and link types for this turn, built from the store before the classify step runs.
+    var typeBlocks: CERTypeBlocks?
     var toolError: String?
     var respondAttempts = 0
     var say = ""

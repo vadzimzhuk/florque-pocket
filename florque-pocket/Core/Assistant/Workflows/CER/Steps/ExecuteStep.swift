@@ -24,7 +24,7 @@ nonisolated struct ExecuteStep: CERStepKind {
         guard let extraction = s.extraction, problems.isEmpty else {
             return .rejected(problems.joined(separator: "; "))
         }
-        return .ok(Input(extraction: extraction, turn: CERTurnValues(s, repair: false)))
+        return .ok(Input(extraction: extraction, turn: CERTurnValues(s)))
     }
 
     func prompt(_ input: Input) -> NoPrompt {
@@ -41,7 +41,7 @@ nonisolated struct ExecuteStep: CERStepKind {
             }
             do {
                 var result = try await tool.run(call.args, context)
-                if result.items.isEmpty, tool.name.hasPrefix("retrieve_"), call.args["query"] != nil {
+                if result.items.isEmpty, tool.name == "retrieve", call.args["query"] != nil {
                     var broader = call.args
                     broader["query"] = nil
                     result = try await tool.run(broader, context)
