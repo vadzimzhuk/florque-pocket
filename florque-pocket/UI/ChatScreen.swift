@@ -19,18 +19,6 @@ struct ChatScreen: View {
                             .font(.footnote)
                             .buttonStyle(.bordered)
                     }
-                    if let entry = vm.entries.first(where: { $0.id == entryId }), !entry.proposals.isEmpty {
-                        ForEach(entry.proposals, id: \.id) { proposal in
-                            HStack {
-                                Text(proposal.title).font(.footnote)
-                                Spacer()
-                                Button("Dismiss") { vm.dismiss(proposal, in: entryId) }
-                                    .buttonStyle(.bordered)
-                                Button("Accept") { vm.accept(proposal, in: entryId) }
-                                    .buttonStyle(.borderedProminent)
-                            }
-                        }
-                    }
                 }
             })
             // Text and media only: without audio, exyte shows the send button, not the mic, when the composer is empty.

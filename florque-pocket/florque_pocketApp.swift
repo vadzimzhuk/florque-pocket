@@ -15,7 +15,7 @@ struct florque_pocketApp: App {
         #endif
         FirebaseApp.configure()
         #if DEBUG
-        // Test hooks: `-backend apple|firebase`, `-workflow intent|cer`, `-policy auto|forceOnDevice|forceCloud`, `-autoSend "text"`.
+        // Test hooks: `-backend apple|firebase`, `-workflow cer`, `-policy auto|forceOnDevice|forceCloud`, `-autoSend "text"`.
         func argument(_ name: String) -> String? {
             guard let i = CommandLine.arguments.firstIndex(of: name), i + 1 < CommandLine.arguments.count else { return nil }
             return CommandLine.arguments[i + 1]

@@ -40,12 +40,7 @@ nonisolated struct CERWorkflow: TurnWorkflow {
 
         return AssistantTurn(say: final.say.isEmpty ? "Done." : final.say,
                              routeLabel: "",
-                             proposals: [],
                              noteId: noteId,
-                             savedOnly: false,
-                             intents: [],
-                             taskIds: [],
-                             reminderFailed: false,
                              gateRejections: final.rejections,
                              changeset: GraphChangeset.combined(final.results.compactMap(\.changeset)))
     }

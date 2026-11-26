@@ -8,7 +8,6 @@ struct ChatEntry: Identifiable, Equatable {
     let isUser: Bool
     var text: String
     var routeLabel: String = ""
-    var proposals: [TaskProposal] = []
     /// What this reply wrote to the graph. Set only on replies that wrote something; Undo reverses it.
     var changeset: GraphChangeset? = nil
 }
@@ -83,23 +82,11 @@ final class ChatViewModel {
             do {
                 let turn = try await target.handle(trimmed, policy: policy, history: history)
                 replace(placeholder.id, with: ChatEntry(id: placeholder.id, isUser: false, text: turn.say,
-                                                        routeLabel: turn.routeLabel, proposals: turn.proposals,
+                                                        routeLabel: turn.routeLabel,
                                                         changeset: turn.changeset))
             } catch {
                 replace(placeholder.id, with: ChatEntry(id: placeholder.id, isUser: false,
                                                         text: "Something went wrong: \(error.localizedDescription)"))
-            }
-        }
-    }
-
-    func accept(_ proposal: TaskProposal, in entryId: String) {
-        Task {
-            do {
-                try await assistant.accept(taskId: proposal.id, reminders: reminders)
-                removeProposal(proposal.id, from: entryId)
-                entries.append(ChatEntry(id: UUID().uuidString, isUser: false, text: "Accepted: \(proposal.title)"))
-            } catch {
-                entries.append(ChatEntry(id: UUID().uuidString, isUser: false, text: "Couldn't accept: \(error.localizedDescription)"))
             }
         }
     }
@@ -120,12 +107,6 @@ final class ChatViewModel {
         }
     }
 
-    func dismiss(_ proposal: TaskProposal, in entryId: String) {
-        Task {
-            try? await assistant.dismiss(taskId: proposal.id)
-            removeProposal(proposal.id, from: entryId)
-        }
-    }
 
     // MARK: exyte mapping
 
@@ -142,10 +123,5 @@ final class ChatViewModel {
 
     private func replace(_ id: String, with entry: ChatEntry) {
         if let i = entries.firstIndex(where: { $0.id == id }) { entries[i] = entry }
-    }
-
-    private func removeProposal(_ taskId: String, from entryId: String) {
-        guard let i = entries.firstIndex(where: { $0.id == entryId }) else { return }
-        entries[i].proposals.removeAll { $0.id == taskId }
     }
 }
